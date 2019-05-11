@@ -1,0 +1,30 @@
+{
+  "name": "todo-er",
+  "version": "1.0.0",
+  "description": "A simple todo demo for data-modela npm package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -r esm src/index.js"
+  },
+  "keywords": [
+    "Node",
+    "todo",
+    "JavaScript",
+    "dummydata"
+  ],
+  "author": "Tutu Godfrey",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "data-modela": "0.0.3",
+    "dotenv-safe": "^6.1.0",
+    "esm": "^3.2.22",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}
