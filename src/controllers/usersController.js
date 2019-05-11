@@ -12,13 +12,15 @@ class UsersController  {
     return users
       .create(req.body)
       .then(async (user) =>  {
-        const { name, username, email } = user;
+        const { name, username, email, id } = user;
         const token = await genToken({
+          id,
           name,
           email,
           username
         });
         res.status(201).json({
+          id,
           name,
           email,
           username,
