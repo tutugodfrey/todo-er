@@ -10,6 +10,7 @@ router.get('/', (req, res) => {
 
 // create new user
 router.post('/users', UsersController.signUp)
+router.post('/users/signin', UsersController.signIn)
 
 
 export default router;
