@@ -1,5 +1,7 @@
 import express from 'express';
 import UsersController from '../controllers/usersController';
+import TodoController from '../controllers/todoController';
+import { authUser } from '../helpers'
 
 const router = express.Router();
 
@@ -11,6 +13,9 @@ router.get('/', (req, res) => {
 // create new user
 router.post('/users', UsersController.signUp)
 router.post('/users/signin', UsersController.signIn)
+
+// todo routes
+router.post('/todos', authUser, TodoController.createTodo)
 
 
 export default router;
