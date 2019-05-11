@@ -17,6 +17,31 @@ class TodoController {
       })
       .catch(err => res.status(500).json(err))
   }
+
+  static getTodo(req, res) {
+    let { id } = req.params;
+    id = parseInt(id, 10)
+    return todos
+      .findById(id)
+      .then(todo => {
+        return res.status(200).json(todo);
+      })
+      .catch(err => res.status(500).json(err))
+  }
+
+  static getTodos(req, res) {
+    const { userId } = req.body;
+    return todos
+      .findAll({
+        where: {
+          userId,
+        }
+      })
+      .then(todo => {
+        return res.status(200).json(todo);
+      })
+      .catch(err => res.status(500).json(err))
+  }
 }
 
 export default TodoController;
