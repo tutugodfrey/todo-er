@@ -58,6 +58,28 @@ class UsersController  {
       })
       .catch(err => res.status(500).send(err))
   }
+
+  static updateUser(req, res) {
+    let { userId } = req.body;
+    const update = req.body
+    return users
+      .update({
+        where: {
+          id: userId
+        }
+      },
+      update
+      )
+      .then(user => {
+        const { name, username, email } = user
+        return res.status(200).json({
+          name,
+          email,
+          username,
+        })
+      })
+      .catch(err => res.status(500).json(err))
+  }
 }
 
 export default UsersController;
