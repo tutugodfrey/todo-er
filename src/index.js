@@ -9,5 +9,5 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(router)
 app.listen(port, () => {
-  console.log(`Tode-er start on port ${port}`)
+  console.log(`Todo-er start on port ${port}`)
 });
