@@ -16,8 +16,9 @@ router.post('/users/signin', UsersController.signIn)
 
 // todo routes
 router.post('/todos', authUser, TodoController.createTodo);
-router.get('/todos', authUser, TodoController.getTodos)
-router.get('/todos/:id', authUser, TodoController.getTodo)
+router.get('/todos', authUser, TodoController.getTodos);
+router.get('/todos/:id', authUser, TodoController.getTodo);
+router.put('/todos/:id', authUser, TodoController.updateTodo)
 
 
 export default router;
