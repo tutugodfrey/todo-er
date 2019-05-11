@@ -58,6 +58,25 @@ class TodoController {
       })
       .catch(err => res.status(200).json(err))
   }
+
+  static deleteTodo(req, res) {
+    let { id } = req.params;
+    id = parseInt(id, 10);
+    const { userId } = req.body;
+    return users
+      .findById(userId)
+      .then(user => {
+        return todos
+        .destroy({
+          where: {
+            id,
+            userId
+          }
+        })
+        .then(result => res.status(200).json(result))
+      })
+      .catch(err => res.status(500).json(err))
+  }
 }
 
 export default TodoController;
