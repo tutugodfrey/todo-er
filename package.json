@@ -4,7 +4,7 @@
   "description": "A simple todo demo for data-modela npm package",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha -r esm client/tests/e2e/tests",
     "start": "nodemon -r esm src/index.js",
     "start:client": "webpack --mode production -w"
   },
@@ -20,13 +20,18 @@
     "@babel/preset-react": "^7.0.0",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chromedriver": "^74.0.0",
     "data-modela": "0.0.3",
     "dotenv-safe": "^6.1.0",
     "esm": "^3.2.22",
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
     "mobx": "^5.9.4",
-    "mobx-react": "^5.4.4"
+    "mobx-react": "^5.4.4",
+    "mocha": "^6.1.4",
+    "selenium-webdriver": "^4.0.0-alpha.1"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
