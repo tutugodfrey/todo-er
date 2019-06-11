@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 
 app.get('*', (req, res) => {
-  res.status(200).sendFile(__dirname + '/public/index.html');
+  res.status(200).sendFile('index.html', { root: './public' });
 });
 
 app.use('/api', router)
