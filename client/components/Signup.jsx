@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import request from '../helpers';
+import { withRouter } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { inject } from 'mobx-react';
 import { compose } from 'recompose';
@@ -46,6 +47,7 @@ import { compose } from 'recompose';
       }
       if (allFieldPass) {
         const res =  await request('/api/users/signup', 'POST', this.state.user)
+        this.props.history.push('/')
       }
     }
     render() {
@@ -115,7 +117,8 @@ import { compose } from 'recompose';
                 <div>
                   <input
                     type="submit"
-                    name="Submit"
+                    name="signup"
+                    value="Sign Up"
                     onClick={this.handleSubmit}
                     />
                   </div>
@@ -132,4 +135,4 @@ import { compose } from 'recompose';
 // }
 
 
-export default Signup;
+export default withRouter(Signup);
