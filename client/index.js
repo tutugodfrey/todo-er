@@ -1,8 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Routes from './Routes.jsx';
+import { Provider } from 'mobx-react';
+import store from './store.js'
 
-const App = () => {
+const App = (props) => {
   return (
     <div>
       <Routes>
@@ -12,4 +14,8 @@ const App = () => {
   )
 }
 
-ReactDOM.render(<App />, document.getElementById('app'));
+ReactDOM.render(
+<Provider store={store}>
+<App store={store} />
+</Provider>,
+document.getElementById('app'));
