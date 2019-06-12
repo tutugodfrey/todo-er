@@ -8,12 +8,13 @@ const app = express();
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
+app.use('/api', router)
 
-app.get('*', (req, res) => {
+// important to keep catch-all route last
+app.get('/*', (re, res, next) => {
   res.status(200).sendFile('index.html', { root: './public' });
 });
-
-app.use('/api', router)
 app.listen(port, () => {
   console.log(`Todo-er start on port ${port}`)
 });
+
