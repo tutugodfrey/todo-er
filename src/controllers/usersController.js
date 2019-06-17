@@ -80,6 +80,24 @@ class UsersController  {
       })
       .catch(err => res.status(500).json(err))
   }
+
+  static getUsers(req, res) {
+    return users
+      .findAll()
+      .then(allUsers => {
+        const result = allUsers.map(user => {
+          const { name, username, email,id } = user;
+          return {
+            id,
+            name,
+            username,
+            email
+          }
+        })
+        return res.status(200).json(result)
+      })
+      .catch(error => res.status(500).json(error))
+  }
 }
 
 export default UsersController;

@@ -19,3 +19,5 @@ ReactDOM.render(
 <App store={store} />
 </Provider>,
 document.getElementById('app'));
+
+export default App;

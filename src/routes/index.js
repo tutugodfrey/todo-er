@@ -14,7 +14,8 @@ router.get('/', (req, res) => {
 // create new user
 router.post('/users/signup', UsersController.signUp);
 router.post('/users/signin', UsersController.signIn);
-router.put('/users', authUser, UsersController.updateUser)
+router.put('/users', authUser, UsersController.updateUser);
+router.get('/users', UsersController.getUsers);
 
 // todo routes
 router.post('/todos', authUser, TodoController.createTodo);

@@ -35,7 +35,7 @@ const driver = new webdriver.Builder()
 
   describe('Scan through the landing page', () => {
     it('get elements on the home page', () => {
-      driver.findElement(By.xpath('//div/h3')).getText()
+      driver.findElement(By.xpath('//div/h1')).getText()
         .then(value => {
         return expect(value).to.equal('Don\'t leave any task uncompleted!')
       });

@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
-import request from '../helpers';
+import { request } from '../helpers';
 import { withRouter } from 'react-router-dom';
+import UserContext from './userContext';
+import Dashboard from './Dashboard.jsx';
 import { observer } from 'mobx-react';
 import { inject } from 'mobx-react';
 import { compose } from 'recompose';
 
 // @observer
 // const signup = Component => {
-  class Signup extends Component  {
+  export class Signup extends Component  {
     constructor(props) {
       super(props);
       this.state =  {
@@ -17,7 +19,8 @@ import { compose } from 'recompose';
           username: '',
           password: '',
           confirmPassword: ''
-        }
+        },
+        createdUser: {},
       };
       this.handleChange = this.handleChange.bind(this);
       this.handleSubmit = this.handleSubmit.bind(this);
@@ -38,6 +41,7 @@ import { compose } from 'recompose';
 
     async handleSubmit(event) {
       event.preventDefault();
+      console.log(event)
       let allFieldPass = true;
       for(let field in this.state.user) {
         if (!this.state.user[field]) {
@@ -46,13 +50,26 @@ import { compose } from 'recompose';
         }
       }
       if (allFieldPass) {
-        const res =  await request('/api/users/signup', 'POST', this.state.user)
-        this.props.history.push('/')
+        const createdUser =  await request('/api/users/signup', 'POST', this.state.user)
+        this.setState({
+          createdUser,
+        });
+        // console.log(createdUser, 'BBBBBBBB')
+        // console.log(res, 'AAAAAAA')      
+        // this.props.history.push('/dashboard')
       }
     }
     render() {
+      const { createdUser } = this.state;
+      if (createdUser.username) {
+        return (
+          <UserContext.Provider value={createdUser}>
+            <Dashboard />
+          </UserContext.Provider>
+        )
+      }
       return (
-        <div>
+        <div className="container">
           <form>
             <div>
               <h3>Signup</h3>
@@ -119,6 +136,7 @@ import { compose } from 'recompose';
                     type="submit"
                     name="signup"
                     value="Sign Up"
+                    id="submit-btn"
                     onClick={this.handleSubmit}
                     />
                   </div>
