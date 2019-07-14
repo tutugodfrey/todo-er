@@ -1,6 +1,8 @@
 import React from 'react'
 import UserContext from './userContext';
 import Profile from './Profile.jsx';
+import Todo from './Todo.jsx'
+import Navigation from './Navigation.jsx'
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 
@@ -9,7 +11,8 @@ class Dashboard extends React.Component {
     // const user = this.props.userStore.getUser;
     return (
       <div>
-        <Profile />
+        <Navigation />
+        <Todo />
       </div>
     );
   }
