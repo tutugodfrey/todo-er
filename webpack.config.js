@@ -7,6 +7,7 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'public'),
     filename: 'bundle.js',
+    publicPath: '/',
   },
   module: {
     rules: [
@@ -16,6 +17,11 @@ module.exports = {
         exclude: /node_modules/,
       }
     ]
+  },
+  devServer: {
+    inline: true,
+    port: 3000,
+    historyApiFallback: true
   },
   plugins: [
     new HtmlWebpackPlugin({

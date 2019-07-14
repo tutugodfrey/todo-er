@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
-import { request } from '../helpers';
 import { withRouter } from 'react-router-dom';
-import UserContext from './userContext';
-import Dashboard from './Dashboard.jsx';
-import { observer } from 'mobx-react';
-import { inject } from 'mobx-react';
+import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 
-// @observer
-// const signup = Component => {
+import { request } from '../helpers';
+
   export class Signup extends Component  {
     constructor(props) {
       super(props);
@@ -29,6 +25,8 @@ import { compose } from 'recompose';
   
   
     handleChange(event) {
+      // event.preventDefault();
+      console.log(event)
       const { name, value } = event.target;
       this.setState({
         ...this.state,
@@ -41,7 +39,6 @@ import { compose } from 'recompose';
 
     async handleSubmit(event) {
       event.preventDefault();
-      console.log(event)
       let allFieldPass = true;
       for(let field in this.state.user) {
         if (!this.state.user[field]) {
@@ -50,24 +47,13 @@ import { compose } from 'recompose';
         }
       }
       if (allFieldPass) {
-        const createdUser =  await request('/api/users/signup', 'POST', this.state.user)
-        this.setState({
-          createdUser,
-        });
-        // console.log(createdUser, 'BBBBBBBB')
-        // console.log(res, 'AAAAAAA')      
-        // this.props.history.push('/dashboard')
+        const createdUser =  await request('/users/signup', 'POST', this.state.user)
+        localStorage.setItem('token', createdUser.token)
+        this.props.userStore.setUser(createdUser)  
+        this.props.history.push('/dashboard')
       }
     }
     render() {
-      const { createdUser } = this.state;
-      if (createdUser.username) {
-        return (
-          <UserContext.Provider value={createdUser}>
-            <Dashboard />
-          </UserContext.Provider>
-        )
-      }
       return (
         <div className="container">
           <form>
@@ -82,7 +68,7 @@ import { compose } from 'recompose';
                     type="text"
                     name="name"
                     defaultValue={this.state.user.name}
-                    onChange={this.handleChange}
+                    onChange={this.handleChange.bind(this)}
                   />
                 </div>
               </div>
@@ -147,10 +133,9 @@ import { compose } from 'recompose';
       )
     }
   }
-//   return compose(
-//     inject('store'),
-//   )(Signup);
-// }
 
-
-export default withRouter(Signup);
+export default compose(
+  inject('userStore'),
+  observer,
+  withRouter
+)(Signup);
