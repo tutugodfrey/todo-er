@@ -12,7 +12,7 @@
     "test": "jest",
     "e2e": "mocha -r esm client/tests/e2e/tests",
     "start": "nodemon -r esm src/index.js",
-    "start:client": "webpack --mode production -w"
+    "start:client": "webpack-dev-server --mode development --hot --open"
   },
   "keywords": [
     "Node",
@@ -31,6 +31,7 @@
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chromedriver": "^74.0.0",
+    "cors": "^2.8.5",
     "data-modela": "0.0.3",
     "dotenv-safe": "^6.1.0",
     "enzyme": "^3.10.0",
