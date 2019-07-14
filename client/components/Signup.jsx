@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 
@@ -117,18 +117,19 @@ import { request } from '../helpers';
                 </div>
               </div>
               <div>
-                <div>
-                  <input
-                    type="submit"
-                    name="signup"
-                    value="Sign Up"
-                    id="submit-btn"
-                    onClick={this.handleSubmit}
-                    />
-                  </div>
+              <div>
+                <input
+                  type="submit"
+                  name="signup"
+                  value="Sign Up"
+                  id="submit-btn"
+                  onClick={this.handleSubmit}
+                  />
+                </div>
               </div>
             </div>
           </form>
+          <p>I already have an account! <Link to="/signin">Sign In here</Link></p>
         </div>
       )
     }

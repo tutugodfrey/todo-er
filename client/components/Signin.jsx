@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 import { request } from '../helpers';
 
 
@@ -61,6 +61,7 @@ class Signin extends Component {
             <button onClick={this.onSignIn}>Sign In</button>
           </div>
         </form>
+        <p>I don't have an account! <Link to="/signup">Sign Up</Link></p>
       </div>
     )
   }

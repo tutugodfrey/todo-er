@@ -23,6 +23,9 @@ module.exports = {
     port: 3000,
     historyApiFallback: true
   },
+  resolve: {
+    extensions: ['.js', '.jsx']
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve('./client/index.html')
