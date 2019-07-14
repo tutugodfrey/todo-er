@@ -41,14 +41,16 @@ class UsersController  {
       })
       .then(async user => {
         const verifyUser = bcrypt.compareSync(password, user.password);
-        const { name, username, email } = user;
+        const { name, username, email, id } = user;
         if (verifyUser) {
           const token = await genToken({
+            id,
             name,
             username,
             email,
           })
           return res.status(200).json({
+            id,
             name,
             username,
             email,
