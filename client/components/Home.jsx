@@ -12,7 +12,7 @@ const Home = () => {
             <h1>Don't leave any task uncompleted!</h1>
             <div><strong id="story">Start using Todo-er</strong></div>
             <div><Link to='/signup'>Sign Up</Link></div>
-            <div><Link to="/login">login here!</Link></div>
+            <div><Link to="/signin">login here!</Link></div>
           </div>
         </div>
         )
