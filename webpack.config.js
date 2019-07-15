@@ -1,34 +1,45 @@
 const path = require('path');
+const webpack = require('webpack');
+const dotenv = require('dotenv-safe');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = {
-  devtool: 'inline-source-map',
-  entry: './client/index.js',
-  output: {
-    path: path.join(__dirname, 'public'),
-    filename: 'bundle.js',
-    publicPath: '/',
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx)$/,
-        use: ['babel-loader'],
-        exclude: /node_modules/,
-      }
+module.exports = () => {
+  const env = dotenv.config().parsed;
+  const envKeys = Object.keys(env).reduce((prev, next) => {
+    prev[`process.env.${next}`] = JSON.stringify(env[next]);
+    return prev;
+  }, {});
+  console.log(envKeys, 'envKeys')
+  return {
+    devtool: 'inline-source-map',
+    entry: './client/index.js',
+    output: {
+      path: path.join(__dirname, 'public'),
+      filename: 'bundle.js',
+      publicPath: '/',
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx)$/,
+          use: ['babel-loader'],
+          exclude: /node_modules/,
+        }
+      ]
+    },
+    devServer: {
+      inline: true,
+      port: 3000,
+      historyApiFallback: true
+    },
+    resolve: {
+      extensions: ['.js', '.jsx']
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: path.resolve('./client/index.html')
+      }),
+      new webpack.DefinePlugin(envKeys),
     ]
-  },
-  devServer: {
-    inline: true,
-    port: 3000,
-    historyApiFallback: true
-  },
-  resolve: {
-    extensions: ['.js', '.jsx']
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: path.resolve('./client/index.html')
-    }),
-  ]
+  }
 }
