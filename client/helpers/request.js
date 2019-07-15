@@ -1,6 +1,6 @@
 
 const request = async (route, method = 'GET', data = {}) => {
-  const baseUrl = 'http://localhost:3005/api';
+  const baseUrl = process.env.API_URL || 'http://localhost:3005/api';
   let res
   if (method === 'GET') {
     res = await fetch(baseUrl + route,
