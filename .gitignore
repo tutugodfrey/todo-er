@@ -1,4 +1,4 @@
 node_modules
 .env
-./public/bundl.js
-./public/index.html
+public/bundle.js
+public/index.html
