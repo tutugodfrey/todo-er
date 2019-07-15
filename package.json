@@ -11,6 +11,7 @@
   "scripts": {
     "test": "jest",
     "e2e": "mocha -r esm client/tests/e2e/tests",
+    "build": "webpack --mode production",
     "start": "nodemon -r esm src/index.js",
     "start:client": "webpack-dev-server --mode development --hot --open"
   },
