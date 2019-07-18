@@ -9,11 +9,13 @@
     ]
   },
   "scripts": {
+    "webpack": "webpack",
     "test": "jest",
+    "testserver": "mocha -r esm src/test/index.js",
     "e2e": "mocha -r esm client/tests/e2e/tests",
-    "build": "webpack --mode production",
     "start:dev": "nodemon -r esm src/index.js",
-    "start": "node -r esm src/index.js",
+    "start": "node -r esm src/app.js",
+    "build": "npm run webpack -- --mode production",
     "start:client": "webpack-dev-server --mode development --hot --open"
   },
   "keywords": [
@@ -28,10 +30,11 @@
     "@babel/plugin-transform-runtime": "^7.4.4",
     "@babel/preset-env": "^7.4.5",
     "@babel/preset-react": "^7.0.0",
-    "bcrypt": "^3.0.6",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.3.0",
     "chromedriver": "^74.0.0",
     "cors": "^2.8.5",
     "data-modela": "0.0.3",

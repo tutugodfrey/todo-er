@@ -1,22 +1,61 @@
+# Build the frontend app will produce the public dir
+FROM node:alpine as build
+WORKDIR /app
+
+COPY package.json ./
+RUN npm install
+
+COPY ./client ./client
+COPY webpack.config.js ./
+# COPY .env ./
+COPY .env.example ./
+COPY .babelrc ./
+# get env variable from arg or use defaults
+ARG PORT=3005
+ARG JWT_SECRET
+ARG API_URL=http://localhost:${PORT}/api
+
+# add to environment variable
+ENV PORT=${PORT}
+ENV API_URL=${API_URL}
+ENV JWT_SECRET=${JWT_SECRET}
+# build frontend app
+RUN npm run build
+
+
+# Build copy all src/ from project root
+# and public/ from build step dir
 # pull official node image
-FROM node:10
+FROM node:alpine
 
 # Create app directory
 LABEL maintainer="Tutu Godfrey <godfrey_tutu@yahoo.com>"
 LABEL description="A simple todo API to make is easy for users to track progress on their tasks"
 
-# get port value from arg
-ARG port=3005
-ENV PORT=$port
+# get env variable from arg or use defaults
+ARG PORT=3005
+ARG JWT_SECRET
+ARG API_URL=http://localhost:${PORT}/api
 
+# add to environment variable
+ENV PORT=${PORT}
+ENV JWT_SECRET=${JWT_SECRET}
+ENV API_URL=${API_URL}
 
 # Create app directory
 WORKDIR /app
+# RUN apk update && apk add nodejs
+# RUN apk add --update npm
+COPY package.json /app/
 
-COPY package*.json /app/
+RUN npm install --production
+COPY --from=build /app/public ./public
+COPY src ./src
+# COPY .env ./
+COPY .env.example ./
+COPY .babelrc ./
 
-RUN npm install
-COPY . /app/
+EXPOSE $PORT
 
-EXPOSE $port
+# start the app
 CMD ["npm", "start"]

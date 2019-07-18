@@ -1,0 +1,12 @@
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: todo-app-pod
+#   labels:
+#     app: todoapp
+# spec:
+#   containers:
+#     - name: todoapp
+#       image: tutug/todoapp:latest
+#       ports:
+#       - containerPort: 3005

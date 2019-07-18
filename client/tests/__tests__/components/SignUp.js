@@ -10,15 +10,15 @@ describe('<SignUp />', () => {
 
   test('should find the heading text', () => {
     const heading = wrapper.find('h3').text();
-    expect(heading).toBe('Signup');
+    expect(heading).toBe('Sign Up');
   })
   test('should render signup page', () => {
-    const div = wrapper.find('.container').length;
+    const div = wrapper.find('.sign-up').length;
     expect(div).toBe(1)
   });
 
   test('should find all input elements', () => {
-    const inputs = wrapper.find('.container').find('input').length;
+    const inputs = wrapper.find('.sign-up').find('input').length;
     expect(inputs).toBe(6);
   });
   test('should find all labels', () => {
