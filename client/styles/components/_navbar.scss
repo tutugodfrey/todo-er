@@ -1,0 +1,35 @@
+#nav-bar {
+  @include container;
+  height: 40px;
+  background: $primaryColor;
+  display: flex;
+  flex-direction: column;
+  #profile {
+    text-align: center;
+    width: 80px;
+    height: 40px;
+    position: absolute;
+    right: 0%;
+    a {
+      text-decoration: none;
+      color: $white;
+      position: absolute;
+      bottom: 5px;
+      @include center(80%, 'absolute');
+    }
+  }
+  #new-todo {
+    text-align: center;
+    width: 90px;
+    height: 40px;
+    position: absolute;
+    right: 80px;
+    a {
+      text-decoration: none;
+      color: $white;
+      position: absolute;
+      bottom: 5px;
+      @include center(80%, 'absolute');
+    }
+  }
+}

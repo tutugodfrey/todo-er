@@ -48,20 +48,47 @@ class Signin extends Component {
   render() {
     return (
       <div>
-        <form>
+        <div>
+          <Link to="/">&laquo; Back</Link>
+        </div>
+        <div className="sign-in">
           <div>
-            <label>Username</label>
-            <input type="text" name="username" value={this.state.username} onChange={this.handleChange} />
+            <h3>Sign In</h3>
           </div>
+          <form>
+            <div>
+              <div className="form-group">
+                <div><label>Username</label></div>
+                <input
+                  type="text"
+                  name="username"
+                  value={this.state.username}
+                  onChange={this.handleChange}
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <div><label>Password</label></div>
+              <div>
+                <input 
+                  type="password"
+                  name="password"
+                  value={this.state.password}
+                  onChange={this.handleChange}
+                  />
+              </div>
+            </div>
+            <div className="form-group">
+              <div>
+                <input type="submit" onClick={this.onSignIn} value="Sign In" />
+              </div>
+            </div>
+          </form>
           <div>
-            <label>password</label>
-            <input type="password" name="password" value={this.state.password} onChange={this.handleChange} />
+            <p>I don't have an account!
+              <Link to="/signup"> Sign Up</Link></p>
           </div>
-          <div>
-            <button onClick={this.onSignIn}>Sign In</button>
-          </div>
-        </form>
-        <p>I don't have an account! <Link to="/signup">Sign Up</Link></p>
+        </div>
       </div>
     )
   }

@@ -1,0 +1,60 @@
+#todos-container {
+  height: 90vh;
+  background: $primaryLight;
+  padding: $padding;
+  > div {
+    width: 100%;
+    h3 {
+      @include center(80%);
+      text-align: center;
+      color: $primaryColor;
+    }
+  }
+  ul .todo {
+    // border: 2px solid $primaryColor;
+    border-radius: $borderRadius;
+    padding: 2px $padding;
+    padding-left: 10px;
+    margin-bottom:10px;
+    width: 90%;
+    min-height: 20px;
+    @include center (90%, '');
+    @include boxShadow($primaryColor);
+    li {
+      list-style: none;
+    }
+    .todo-bar {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      .mini-todo-content {
+        display: flex;
+        width: 90%;
+        flex-direction: row;
+        justify-content: space-between;
+        .todo-bar_title {
+          padding: 3px;
+          padding-top: 12px;
+        }
+      }
+      button {
+        @include button(50px, $white, $primaryColor);
+        border-radius: $borderRadius;
+        height: 25px
+      }
+    }
+    .todos {
+      button[class^=delete] {
+        @include button(50px, $white, $red);
+        border-radius: $borderRadius;
+        height: 25px
+      }
+      button[class^=edit] {
+        @include button(50px, $white, $primaryColor);
+        border-radius: $borderRadius;
+        height: 25px;
+      }
+    }
+  }
+}

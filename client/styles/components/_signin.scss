@@ -1,0 +1,27 @@
+.sign-in {
+  position: relative;
+  top: 70px;
+  border: 2px solid $primaryColor;
+  padding: $padding;
+  @include borderRadius;
+  @include center(50%);
+  .form-group {
+    color: $primaryColor;
+    padding: 5px;
+    margin: 2px;
+  }
+  div > h3 {
+    @include center(40%);
+    color: $primaryColor;
+  }
+  div input {
+    @include center(80%);
+    @include borderRadius;
+    padding: 5px;
+  }
+  input[type=submit] {
+    @include center(50%);
+    background-color: $primaryColor;
+    color: $white;
+  }
+}
