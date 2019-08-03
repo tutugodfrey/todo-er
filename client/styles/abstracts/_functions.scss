@@ -1,0 +1,46 @@
+@mixin borderRadius($value: 5px) {
+  border-radius: $value;
+}
+
+@mixin container {
+  width: 100%;
+}
+
+@mixin toggleElementDisplay {
+  .show-item {
+    display: block;
+  }
+  .hide-item {
+    display: none;
+  }
+}
+
+@mixin toggleElementVisibility {
+  .visible {
+    visibility: visible;
+  }
+  .hidden {
+    visibility: hidden;
+  }
+}
+
+@mixin center($width, $position-1: relative) {
+  $rest: calc(100% - #{$width});
+  $half: calc(#{$rest} / 2);
+  width: $width + 0%;
+  position: $position-1;
+  left: $half;
+}
+
+@mixin button ($width, $color, $backgroundColor, $padding: $padding, $margin: 2px) {
+  width: $width;
+  color: $color;
+  background: $backgroundColor;
+  padding: $padding;
+  margin: $margin;
+
+}
+
+@mixin boxShadow($spreadColor) {
+  box-shadow: 1px 1px 3px 2px $spreadColor;
+}

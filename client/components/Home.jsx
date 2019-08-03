@@ -4,21 +4,15 @@ import UserContext from './userContext';
 
 const Home = () => {
   return (
-    <UserContext.Consumer>
-      {createdUser => {
-        return (
-          <div>
-          <div>
-            <h1>Don't leave any task uncompleted!</h1>
-            <div><strong id="story">Start using Todo-er</strong></div>
-            <div><Link to='/signup'>Sign Up</Link></div>
-            <div><Link to="/signin">login here!</Link></div>
-          </div>
-        </div>
-        )
-      }}
-    </UserContext.Consumer>
-  )
+    <div>
+      <div>
+        <h1>Don't leave any task uncompleted!</h1>
+        <div><strong id="story">Start using Todo-er</strong></div>
+        <div><Link to='/signup'>Sign Up</Link></div>
+        <div><Link to="/signin">Login here!</Link></div>
+      </div>
+    </div>
+  );
 }
 
 export default Home;

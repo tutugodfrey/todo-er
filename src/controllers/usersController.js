@@ -4,6 +4,7 @@ import { genToken } from '../helpers'
 
 class UsersController  {
   static signUp(req, res)  {
+    console.log(req)
     const saltRounds = 10;
     const { password } = req.body;
     const salt = bcrypt.genSaltSync(saltRounds);

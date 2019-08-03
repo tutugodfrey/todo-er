@@ -12,7 +12,8 @@
     "test": "jest",
     "e2e": "mocha -r esm client/tests/e2e/tests",
     "build": "webpack --mode production",
-    "start": "nodemon -r esm src/index.js",
+    "start:dev": "nodemon -r esm src/index.js",
+    "start": "node -r esm src/index.js",
     "start:client": "webpack-dev-server --mode development --hot --open"
   },
   "keywords": [
@@ -52,12 +53,16 @@
     "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-proposal-decorators": "^7.4.4",
     "babel-loader": "^8.0.6",
+    "css-loader": "^3.1.0",
     "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.12.0",
     "nodemon": "^1.19.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
     "recompose": "^0.30.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
     "webpack": "^4.32.2",
     "webpack-cli": "^3.3.2",
     "webpack-dev-server": "^3.4.1"

@@ -55,81 +55,96 @@ import { request } from '../helpers';
     }
     render() {
       return (
-        <div className="container">
-          <form>
+        <div>
+          <div>
+            <Link to="/">&laquo; Back</Link>
+          </div>
+          <div className="sign-up">
+            <form>
+              <div>
+                <h3>Sign Up</h3>
+              </div>
+              <div>
+                <div className="form-group">
+                  <div><label>Name</label></div>
+                  <div>
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Full Name"
+                      defaultValue={this.state.user.name}
+                      onChange={this.handleChange.bind(this)}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div><label>Email</label></div>
+                  <div>
+                    <input 
+                      type="text"
+                      name="email"
+                      placeholder="Email"
+                      defaultValue={this.state.user.email}
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div><label>Username</label></div>
+                  <div>
+                    <input
+                      type="text"
+                      name="username"
+                      placeholder="Username"
+                      defaultValue={this.state.user.username}
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div><label>password</label></div>
+                  <div>
+                    <input
+                      type="password"
+                      name="password"
+                      placeholder="Password"
+                      defaultValue={this.state.user.password}
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <div><label>Confirm Password</label></div>
+                  <div>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="Confirm"
+                      defaultValue={this.state.user.confirmPassword}
+                      onChange={this.handleChange}
+                    />
+                  </div>
+                </div>
+                <div>
+                <div className="form-group">
+                  <div>
+                    <input
+                      type="submit"
+                      name="signup"
+                      value="Sign Up"
+                      id="submit-btn"
+                      onClick={this.handleSubmit}
+                    />
+                  </div>
+                </div>
+                </div>
+              </div>
+            </form>
             <div>
-              <h3>Signup</h3>
+              <p>I already have an account! 
+                <Link to="/signin"> Sign In here</Link></p>
             </div>
-            <div>
-              <div>
-                <div><label>Name</label></div>
-                <div>
-                  <input
-                    type="text"
-                    name="name"
-                    defaultValue={this.state.user.name}
-                    onChange={this.handleChange.bind(this)}
-                  />
-                </div>
-              </div>
-              <div>
-                <div><label>Email</label></div>
-                <div>
-                  <input 
-                    type="text"
-                    name="email"
-                    defaultValue={this.state.user.email}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-              <div>
-                <div><label>Username</label></div>
-                <div>
-                  <input
-                    type="text"
-                    name="username"
-                    defaultValue={this.state.user.username}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-              <div>
-                <div><label>password</label></div>
-                <div>
-                  <input
-                    type="password"
-                    name="password"
-                    defaultValue={this.state.user.password}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-              <div>
-                <div><label>passsword</label></div>
-                <div>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    defaultValue={this.state.user.confirmPassword}
-                    onChange={this.handleChange}
-                  />
-                </div>
-              </div>
-              <div>
-              <div>
-                <input
-                  type="submit"
-                  name="signup"
-                  value="Sign Up"
-                  id="submit-btn"
-                  onClick={this.handleSubmit}
-                  />
-                </div>
-              </div>
-            </div>
-          </form>
-          <p>I already have an account! <Link to="/signin">Sign In here</Link></p>
+          </div>
         </div>
       )
     }

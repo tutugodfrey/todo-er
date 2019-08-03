@@ -13,7 +13,8 @@ app.use(express.static('public'));
 app.use('/api', router)
 
 // important to keep catch-all route last
-app.get('/*', (re, res, next) => {
+app.get('/*', (req, res) => {
+  console.log('appp')
   res.status(200).sendFile('index.html', { root: './public' });
 });
 app.listen(port, () => {
