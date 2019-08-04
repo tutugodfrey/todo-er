@@ -9,6 +9,7 @@
 
 body {
   margin: 0;
+  color: $black;
 }
 @include toggleElementDisplay;
 @include toggleElementVisibility;

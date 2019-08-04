@@ -35,29 +35,34 @@ class TodoForm extends Component {
 
   render() {
     return (
-      <div>
+      <div id="todo-form_container">
         <form>
-          <div>
-            <label htmlFor="title">Title</label>
+          <div className="form-header">
+            <h3>Add a Task to Complete</h3>
+          </div>
+          <div className="form-group">
+            <label htmlFor="title">Add Title</label><br />
             <input
               type="text"
               id="title"
               name="title"
+              placeholder='Title'
               value={this.state.title}
               onChange={this.handleChange}
             />
           </div>
-          <div>
-            <label htmlFor="description">Description</label>
+          <div className="form-group">
+            <label htmlFor="description">Add Description</label><br />
             <input
               type="text"
               id="description"
               name="description"
+              placeholder='Description'
               value={this.state.description}
               onChange={this.handleChange}
             />
           </div>
-          <div>
+          <div className="form-group">
             <button type="button" onClick={this.onSaveTodo}>Save</button>
           </div>
         </form>

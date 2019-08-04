@@ -20,7 +20,8 @@ class Todo extends Component {
     this.state = {
       completeTodo: {
         completed: false,
-      }
+      },
+      showTodoForm: true,
     }
   }
   async componentWillMount() {
@@ -64,11 +65,23 @@ class Todo extends Component {
     }
   }
 
+  toggleTodoForm(evnet) {
+    this.setState({
+      showTodoForm: !this.state.showTodoForm,
+    })
+  }
+
   render() {
     const todos = this.props.todoStore.todos;
+    const { showTodoForm } = this.state;
     return (
       <div id="todos-container">
-        { !todos.length && <TodoForm /> }
+        <div id="todo-form_control">
+          <div id="toggle-todo-form_div">
+              <button id='toggle-todoform_button' onClick={this.toggleTodoForm.bind(this)}>{showTodoForm ? 'Close Form': 'New Task'}</button>
+          </div>
+          { !todos.length || showTodoForm && <TodoForm /> }
+        </div>
         <div>
           <h3>{todos.length ? 'Your Todos' : 'No Todos! Start adding your tasks'}</h3>
           <ul>
