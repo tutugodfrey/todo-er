@@ -95,7 +95,7 @@ class Signin extends Component {
 }
 
 export default compose(
-  observer,
   inject('userStore'),
+  observer,
   withRouter,
 )(Signin);
