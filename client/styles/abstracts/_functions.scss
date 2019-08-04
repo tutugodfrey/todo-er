@@ -27,7 +27,7 @@
 @mixin center($width, $position-1: relative) {
   $rest: calc(100% - #{$width});
   $half: calc(#{$rest} / 2);
-  width: $width + 0%;
+  width: $width;
   position: $position-1;
   left: $half;
 }
@@ -44,3 +44,5 @@
 @mixin boxShadow($spreadColor) {
   box-shadow: 1px 1px 3px 2px $spreadColor;
 }
+
+// @mixin boxShadow2()

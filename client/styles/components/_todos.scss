@@ -1,5 +1,5 @@
 #todos-container {
-  height: 90vh;
+  min-height: 90vh;
   background: $primaryLight;
   padding: $padding;
   > div {
@@ -10,8 +10,60 @@
       color: $primaryColor;
     }
   }
+  #todo-form_control {
+    padding: 5px;
+    @include center(90%);
+    margin: 0;
+    margin-bottom: 50px;
+    margin-top: 20px;
+    #toggle-todo-form_div {
+      position: relative;
+      width: 100%;
+      button {
+        border: none;
+        color: $primaryColor;
+        @include boxShadow($primaryColor);
+        padding: $padding;
+        position: absolute;
+        right: 10px;
+        border-radius: $borderRadius;
+      }
+    }
+    #todo-form_container {
+      @include boxShadow($primaryColor);
+      background: transparentize($color: $primaryColor, $amount: 0.8);
+      padding: 5px;
+      @include center(60%);
+      form {
+        display: flex;
+        flex-direction: column;
+        padding: 20px 5px;
+        padding-top: 0;
+        .form-header h3 {
+          color: $black;
+        }
+        div.form-group {
+          margin: 3px;
+          input {
+            position: relative;
+            caret-color: $primaryColor;
+            @include center(80%);
+            @include borderRadius;
+            padding: 5px;
+          }
+          button {
+            @include center(60%);
+            background-color: $primaryColor;
+            border-radius: $borderRadius;
+            color: $white;
+            margin-top: 10px;
+            padding: 5px 0;
+          }
+        }
+      }
+    }
+  }
   ul .todo {
-    // border: 2px solid $primaryColor;
     border-radius: $borderRadius;
     padding: 2px $padding;
     padding-left: 10px;
