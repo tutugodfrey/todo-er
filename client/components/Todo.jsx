@@ -65,7 +65,7 @@ class Todo extends Component {
     }
   }
 
-  toggleTodoForm(evnet) {
+  toggleTodoForm(event) {
     this.setState({
       showTodoForm: !this.state.showTodoForm,
     })
@@ -80,7 +80,7 @@ class Todo extends Component {
           <div id="toggle-todo-form_div">
               <button id='toggle-todoform_button' onClick={this.toggleTodoForm.bind(this)}>{showTodoForm ? 'Close Form': 'New Task'}</button>
           </div>
-          { !todos.length || showTodoForm && <TodoForm /> }
+          { (!todos.length || showTodoForm) && <TodoForm /> }
         </div>
         <div>
           <h3>{todos.length ? 'Your Todos' : 'No Todos! Start adding your tasks'}</h3>
@@ -105,13 +105,35 @@ class Todo extends Component {
                 <div id={`toggle-todo-${todo.id}-main`} className={'hide-item todos'}>
                   <li key={todo.id}>
                     <div>
-                      <strong>Title: </strong><span>{todo.title}</span><br />
-                      <strong>Description: </strong><span>{todo.description}</span><br />
-                      <CompleteTodoCheckbox
-                        todo={todo}
-                        toggleCompleted={this.toggleCompleted.bind(this)}
-                      />
-                      <label htmlFor={`todo-${todo.id}`}> Completed</label><br />
+                      <div>
+                        <strong>Title: </strong><span>{todo.title}</span>
+                      </div>
+                      <div>
+                        <strong>Description: </strong><span>{todo.description}</span>
+                      </div>
+                      <div>
+                        <strong>Links: </strong>
+                        <div>{todo.links && todo.links.length && todo.links.map((link, index)=> {
+                          return (
+                            <span key={index}>
+                              {/* {<button 
+                                onClick={event => this.removeLink(event, index)}
+                              >x
+                              </button>} */}
+                              <a href={link.url} target="_blank" rel="noopener noreferrer">{link.linkText || link.url}
+                              </a><br />
+                            </span>
+                          );
+                        })}
+                        </div>
+                      </div>
+                      <div>
+                        <CompleteTodoCheckbox
+                          todo={todo}
+                          toggleCompleted={this.toggleCompleted.bind(this)}
+                        />
+                        <label htmlFor={`todo-${todo.id}`}> Completed</label>
+                      </div>
                       <button type="button" className="edit-todo">Edit</button>
                       <button type="button" className="delete-todo">Delete</button>
                     </div>
