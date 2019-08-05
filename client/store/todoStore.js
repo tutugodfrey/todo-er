@@ -23,6 +23,15 @@ class TodoStore {
     });
   };
 
+  @action deleteTodo = (id) => {
+    this.todos.filter((todo, index )=> {
+      if (todo.id === id) {
+        this.todos.splice(index, 1)
+        return this.todos;
+      }
+    });
+  }
+
   @computed get getTodos() {
     return this.todos.map(todo => {
       const keys = Object.keys();
