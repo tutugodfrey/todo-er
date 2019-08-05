@@ -137,9 +137,21 @@ class Todo extends Component {
   async updateTodo(event) {
     const { id } = event.target;
     const todoId = parseInt(id.split('-')[2], 10);
-    const updatedTodo = await request(`/todos/${todoId}`, 'PUT', this.state.todoToEdit);
+    const updatedTodo =
+    await request(`/todos/${todoId}`, 'PUT',
+      this.state.todoToEdit);
     this.toggleEditMode()
     this.props.todoStore.updateTodo(updatedTodo)
+  }
+
+  async handleDeleteTodo(event) {
+    const { id } = event.target;
+    const todoId = parseInt(id.split('-')[2], 10);
+    const deleteResponse =
+    await request(`/todos/${todoId}`, 'DELETE');
+    if (deleteResponse.message) {
+      this.props.todoStore.deleteTodo(todoId);
+    }
   }
 
   render() {
@@ -278,6 +290,8 @@ class Todo extends Component {
                       <button
                         type="button"
                         className="delete-todo"
+                        id={`edit-todo-${todo.id}`}
+                        onClick={this.handleDeleteTodo.bind(this)}
                       >Delete</button>
                     </div>
                   </li>
