@@ -108,6 +108,23 @@
       }
     }
     .todos {
+      margin-bottom: 10px;
+      input {
+        @include borderRadius;
+        padding: 5px 3px;
+      };
+      fieldset {
+        margin-top: 5px;
+        margin-bottom: 10px;
+        @include borderRadius;
+        width: 80%;
+        input {
+          @include borderRadius;
+          margin: 5px;
+          padding: 3px;
+          width: 60%;
+        }
+      }
       button[class^=delete] {
         @include button(50px, $white, $red);
         border-radius: $borderRadius;
@@ -115,6 +132,12 @@
       }
       button[class^=edit] {
         @include button(50px, $white, $primaryColor);
+        border-radius: $borderRadius;
+        height: 25px;
+      }
+
+      button[class~=save-todo-update] {
+        @include button(50px, $white, $green);
         border-radius: $borderRadius;
         height: 25px;
       }
