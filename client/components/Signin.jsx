@@ -12,7 +12,7 @@ class Signin extends Component {
     super()
     this.closeConsole = closeConsole.bind(this)
     this.state = {
-      consoleMessage: 'jddjisdinjdsdidjnijdsvdvsbhifbhidfdhidisbh',
+      consoleMessage: '',
       user: {
         username: '',
         password: '',
