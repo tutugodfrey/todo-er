@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TodoForm from './TodoForm.jsx';
+import ConsoleModal from './ConsoleModal';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 import { request } from '../helpers';
