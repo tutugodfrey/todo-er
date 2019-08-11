@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { compose } from 'recompose';
 import { observer, inject } from 'mobx-react';
-import { request } from '../helpers'
+import ConsoleModal from './ConsoleModal'
+import { request, closeConsole } from '../helpers'
 class TodoForm extends Component {
   constructor() {
     super()
     this.handleChange = this.handleChange.bind(this);
     this.onSaveTodo = this.onSaveTodo.bind(this);
+    this.closeConsole = closeConsole.bind(this);
     this.state = {
+      consoleMessage: '',
       link: {
         url: '',
         linkText: '',
@@ -16,7 +19,7 @@ class TodoForm extends Component {
         title: '',
         description: '',
         links: [],
-      }
+      },
     }
   };
 
@@ -28,7 +31,7 @@ class TodoForm extends Component {
         ...this.state.todoObj,
         [name]: value
       }
-    })
+    });
   };
 
   handleEnterLink(event) {
@@ -70,40 +73,77 @@ class TodoForm extends Component {
 
   async onSaveTodo(event) {
     const todo = await request('/todos', 'POST', this.state.todoObj);
+    if (todo.message) {
+      console.log(todo.message);
+      const { message } = todo;
+      let errorMessage = message;
+      if (message === 'duplicate entry for unique key title') {
+        errorMessage = 'A todo with this title already exist'
+      }
+      this.setState({
+        consoleMessage: errorMessage
+      })
+      return null
+    }
     this.props.todoStore.addTodo(todo);
+
+    // Reset state
+    this.setState({
+      todoObj: {
+        title: '',
+        description: '',
+        links: [],
+      },
+    })
   };
 
   render() {
+    let disableSubmit
+    const {
+      title,
+      description,
+      links
+    } = this.state.todoObj;
+    const { consoleMessage } = this.state;
+    title && description ? disableSubmit = false : disableSubmit = true
     return (
       <div id="todo-form_container">
+        {consoleMessage &&
+          <ConsoleModal
+            message={consoleMessage}
+            closeConsole={this.closeConsole}
+          />
+        }
         <form>
           <div className="form-header">
             <h3>Add a Task to Complete</h3>
           </div>
           <div className="form-group">
-            <label htmlFor="title">Add Title</label><br />
+            <label htmlFor="title">Add Title</label>
+            <span className="requiredFields">*</span><br />
             <input
               type="text"
               id="title"
               name="title"
               placeholder='Title'
-              value={this.state.title}
+              value={title}
               onChange={this.handleChange}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="description">Add Description</label><br />
+            <label htmlFor="description">Add Description</label>
+            <span className="requiredFields">*</span><br />
             <input
               type="text"
               id="description"
               name="description"
               placeholder='Description'
-              value={this.state.description}
+              value={description}
               onChange={this.handleChange}
             />
           </div>
           <div>{
-            this.state.todoObj.links.map((link, index) => {
+            links.map((link, index) => {
               return (
                 <span key={index}>
                   <button 
@@ -148,6 +188,7 @@ class TodoForm extends Component {
             <button
               type="button"
               onClick={this.onSaveTodo}
+              disabled={disableSubmit}
             >Save</button>
           </div>
         </form>

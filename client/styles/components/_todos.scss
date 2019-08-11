@@ -59,6 +59,9 @@
             margin-top: 10px;
             padding: 5px 0;
           }
+          input[disabled][type=submit], button[disabled][type=button] {
+            color: $black;
+          }
           fieldset {
             margin-top: 5px;
             @include borderRadius;

@@ -3,12 +3,16 @@ import { withRouter, Link } from 'react-router-dom';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 
-import { request } from '../helpers';
+import ConsoleModal from './ConsoleModal';
+
+import { request, closeConsole } from '../helpers';
 
   export class Signup extends Component  {
     constructor(props) {
       super(props);
+      this.closeConsole = closeConsole.bind(this)
       this.state =  {
+        consoleMessage: '',
         user: {
           name: '',
           email: '',
@@ -26,7 +30,6 @@ import { request } from '../helpers';
   
     handleChange(event) {
       // event.preventDefault();
-      console.log(event)
       const { name, value } = event.target;
       this.setState({
         ...this.state,
@@ -47,80 +50,122 @@ import { request } from '../helpers';
         }
       }
       if (allFieldPass) {
-        const createdUser =  await request('/users/signup', 'POST', this.state.user)
+        const createdUser =  await request('/users/signup', 'POST', this.state.user);
+        if (createdUser.message) {
+          let errorMessage = createdUser.message;
+          if (errorMessage.indexOf('unique') >= 0) {
+            errorMessage = 'User with detail you provide already exist'
+          }
+          this.setState({
+            consoleMessage: errorMessage,
+          });
+          console.log(createdUser.message)
+          return null;
+        }
+
         localStorage.setItem('token', createdUser.token)
         this.props.userStore.setUser(createdUser)  
         this.props.history.push('/dashboard')
       }
     }
     render() {
+      let disabled;
+      const {
+        name,
+        email,
+        username,
+        password,
+        confirmPassword
+      } = this.state.user;
+      const { consoleMessage } = this.state;
+      !name ||
+      !email ||
+      !username ||
+      !password ||
+      !confirmPassword ? disabled = true : disabled = false;
       return (
         <div>
           <div>
             <Link to="/">&laquo; Back</Link>
           </div>
           <div className="sign-up">
+            {consoleMessage &&
+              <ConsoleModal
+                message={consoleMessage}
+                closeConsole={this.closeConsole}
+              />
+            }
             <form>
               <div>
                 <h3>Sign Up</h3>
               </div>
               <div>
                 <div className="form-group">
-                  <div><label>Name</label></div>
+                  <div><label>Name</label>
+                    <span className="requiredFields">*</span>
+                  </div>
                   <div>
                     <input
                       type="text"
                       name="name"
                       placeholder="Full Name"
-                      defaultValue={this.state.user.name}
+                      value={name}
                       onChange={this.handleChange.bind(this)}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <div><label>Email</label></div>
+                  <div><label>Email</label>
+                    <span className="requiredFields">*</span>
+                  </div>
                   <div>
                     <input 
                       type="text"
                       name="email"
                       placeholder="Email"
-                      defaultValue={this.state.user.email}
+                      value={email}
                       onChange={this.handleChange}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <div><label>Username</label></div>
+                  <div><label>Username</label>
+                    <span className="requiredFields">*</span>
+                  </div>
                   <div>
                     <input
                       type="text"
                       name="username"
                       placeholder="Username"
-                      defaultValue={this.state.user.username}
+                      value={username}
                       onChange={this.handleChange}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <div><label>password</label></div>
+                  <div><label>password</label>
+                    <span className="requiredFields">*</span>
+                  </div>
                   <div>
                     <input
                       type="password"
                       name="password"
                       placeholder="Password"
-                      defaultValue={this.state.user.password}
+                      value={password}
                       onChange={this.handleChange}
                     />
                   </div>
                 </div>
                 <div className="form-group">
-                  <div><label>Confirm Password</label></div>
+                  <div><label>Confirm Password</label>
+                    <span className="requiredFields">*</span>
+                  </div>
                   <div>
                     <input
                       type="password"
                       name="confirmPassword"
                       placeholder="Confirm"
-                      defaultValue={this.state.user.confirmPassword}
+                      value={confirmPassword}
                       onChange={this.handleChange}
                     />
                   </div>
@@ -133,6 +178,7 @@ import { request } from '../helpers';
                       name="signup"
                       value="Sign Up"
                       id="submit-btn"
+                      disabled={disabled}
                       onClick={this.handleSubmit}
                     />
                   </div>

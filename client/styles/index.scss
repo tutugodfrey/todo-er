@@ -6,10 +6,17 @@
 @import 'components/signin';
 @import 'components/navbar';
 @import 'components/todos';
+@import 'components/consoleModal';
 
 body {
   margin: 0;
   color: $black;
+  input[disabled][type=submit]{
+    color: $black;
+  }
+  span[class=requiredFields] {
+    color: $red;
+  }
 }
 @include toggleElementDisplay;
 @include toggleElementVisibility;
