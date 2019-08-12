@@ -22,7 +22,13 @@ const request = async (route, method = 'GET', data = {}) => {
         body: JSON.stringify(data)
       })
   }
-  return res.json();
+  const response = await res.json();
+  response.message ? console.log(response.message) : null
+  if (response.message && response.message === 'invalid token' ) {
+    localStorage.clear();
+    location.pathname= '/signin'
+  }
+  return response;
 }
 
 export default request;

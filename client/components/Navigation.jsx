@@ -1,14 +1,24 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react'
+import { Link, withRouter } from 'react-router-dom';
 
-const Navigation = () => {
-  return (
-    <div id="nav-bar">
-      <div id="profile">
-        <Link to='./profile'>Profile</Link>
+class Navigation extends Component {
+  logout() {
+    localStorage.clear();
+    return this.props.history.push('/signin')
+  }
+
+  render() {
+    return (
+      <div id="nav-bar">
+        <div id="profile">
+          <Link to='./profile'>Profile</Link>
+        </div>
+        <div id="logout">
+          <a onClick={this.logout.bind(this)}>Log Out</a>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
-export default Navigation;
+export default withRouter(Navigation);

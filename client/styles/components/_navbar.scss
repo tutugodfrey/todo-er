@@ -4,12 +4,12 @@
   background: $primaryColor;
   display: flex;
   flex-direction: column;
-  #profile {
+  #profile, #logout {
     text-align: center;
     width: 80px;
     height: 40px;
     position: absolute;
-    right: 0%;
+    right: 10%;
     a {
       text-decoration: none;
       color: $white;
@@ -18,6 +18,10 @@
       @include center(80%, 'absolute');
     }
   }
+  #logout {
+    right: 0;
+  }
+
   #new-todo {
     text-align: center;
     width: 90px;
