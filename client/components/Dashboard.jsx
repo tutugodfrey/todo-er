@@ -1,17 +1,21 @@
-import React from 'react'
-import UserContext from './userContext';
-import Profile from './Profile.jsx';
+import React from 'react';
+import { Redirect } from 'react-router-dom';
 import Todo from './Todo.jsx'
 import Navigation from './Navigation.jsx'
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
+import { logout } from '../helpers'
 
 class Dashboard extends React.Component {
   render() {
     // const user = this.props.userStore.getUser;
+    const isLoggedIn = !!localStorage.getItem('token');
     return (
       <div>
-        <Navigation />
+        {!isLoggedIn && 
+          <Redirect to="/signin" />
+        }
+        <Navigation logout={logout} />
         <Todo />
       </div>
     );
