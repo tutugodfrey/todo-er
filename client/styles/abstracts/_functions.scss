@@ -42,7 +42,5 @@
 }
 
 @mixin boxShadow($spreadColor) {
-  box-shadow: 1px 1px 3px 2px $spreadColor;
+  box-shadow: 1px 1px 2px 2px $spreadColor;
 }
-
-// @mixin boxShadow2()

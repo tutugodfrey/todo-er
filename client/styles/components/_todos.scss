@@ -1,6 +1,6 @@
 #todos-container {
   min-height: 90vh;
-  background: $primaryLight;
+  background: $white;
   padding: $padding;
   > div {
     width: 100%;
@@ -22,7 +22,7 @@
       button {
         border: none;
         color: $primaryColor;
-        @include boxShadow($primaryColor);
+        @include boxShadow($ambientBlack);
         padding: $padding;
         position: absolute;
         right: 10px;
@@ -30,8 +30,10 @@
       }
     }
     #todo-form_container {
-      @include boxShadow($primaryColor);
+      @include boxShadow($ambientBlack);
       background: transparentize($color: $primaryColor, $amount: 0.8);
+      border-top-left-radius: $borderRadius;
+      border-bottom-right-radius: $borderRadius;
       padding: 5px;
       @include center(60%);
       form {
@@ -79,13 +81,14 @@
   }
   ul .todo {
     border-radius: $borderRadius;
+    background: $primaryLight;
     padding: 2px $padding;
     padding-left: 10px;
     margin-bottom:10px;
     width: 90%;
     min-height: 20px;
     @include center (90%, '');
-    @include boxShadow($primaryColor);
+    @include boxShadow($ambientBlack);
     li {
       list-style: none;
     }
@@ -102,6 +105,7 @@
         .todo-bar_title {
           padding: 3px;
           padding-top: 12px;
+          font-weight: bold;
         }
       }
       button {

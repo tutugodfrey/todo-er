@@ -19,7 +19,7 @@ body {
   span[class=requiredFields] {
     color: $red;
   }
-  background: $primaryLight;
+  background: $white;
 }
 @include toggleElementDisplay;
 @include toggleElementVisibility;
