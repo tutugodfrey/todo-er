@@ -2,6 +2,14 @@
   border-radius: $value;
 }
 
+@mixin padding($value: 5px) {
+  padding: $value;
+}
+
+@mixin margin($value: 5px) {
+  margin: $value;
+}
+
 @mixin container {
   width: 100%;
 }

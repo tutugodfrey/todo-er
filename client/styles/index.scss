@@ -1,5 +1,6 @@
 @import 'abstracts/variables';
 @import 'abstracts/functions';
+@import 'abstracts/helpers';
 
 @import 'components/button';
 @import 'components/home';
@@ -9,6 +10,7 @@
 @import 'components/navbar';
 @import 'components/todos';
 @import 'components/consoleModal';
+@import 'components/profile';
 
 body {
   margin: 0;

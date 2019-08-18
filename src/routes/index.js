@@ -16,6 +16,7 @@ router.post('/users/signup', UsersController.signUp);
 router.post('/users/signin', UsersController.signIn);
 router.put('/users', authUser, UsersController.updateUser);
 router.get('/users', UsersController.getUsers);
+router.get('/user', authUser, UsersController.getUser)
 
 // todo routes
 router.post('/todos', authUser, TodoController.createTodo);
