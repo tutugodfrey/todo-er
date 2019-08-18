@@ -14,7 +14,7 @@
     height: 400px;
     > div {
       position: relative;
-      background: rgba(0, 0, 0, .4);
+      background: $ambientBlack;
       @include center(102%);
       height: 100%;
       top: -25px;

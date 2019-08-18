@@ -1,27 +1,55 @@
-.sign-in {
-  position: relative;
-  top: 70px;
-  border: 2px solid $primaryColor;
-  padding: $padding;
-  @include borderRadius;
-  @include center(50%);
-  .form-group {
-    color: $primaryColor;
-    padding: 5px;
-    margin: 2px;
-  }
-  div > h3 {
-    @include center(40%);
-    color: $primaryColor;
-  }
-  div input {
-    @include center(80%);
+#signin-page {
+  min-height: 100vh;
+  background: $white;
+
+  .back-link_div {
+    position: relative;
+    width: 70px;
+    top: 20px;
+    left: 20px;
+    padding: 7px 10px;
+    @include boxShadow($ambientBlack);
+    background: $primaryLight;
     @include borderRadius;
-    padding: 5px;
+    a {
+      @include center(90%);
+      text-decoration: none;
+      // padding: 20px 20px;
+      color: $primaryColor;
+    }
   }
-  input[type=submit] {
+  .sign-in {
+    @include boxShadow($ambientBlack);
+    position: relative;
+    background: $primaryLight;
+
+    top: 20vh;
+    // border: 2px solid $primaryColor;
+    padding: $padding;
+    @include borderRadius;
     @include center(50%);
-    background-color: $primaryColor;
-    color: $white;
+    .form-group {
+      color: $primaryColor;
+      padding: 5px;
+      margin: 2px;
+    }
+    div > h3 {      
+      text-shadow: 1px 1px 2px $primaryColor;
+      @include center(40%);
+      text-align: center;
+      color: $primaryColor;
+    }
+    div input {
+      @include center(80%);
+      @include borderRadius;
+      border: none;
+      @include boxShadow($ambientBlack);
+      padding: 5px;
+    }
+    input[type=submit] {
+      @include center(50%);
+      background-color: $primaryColor;
+      color: $white;
+    }
   }
 }

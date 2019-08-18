@@ -84,8 +84,8 @@ import { request, closeConsole } from '../helpers';
       !password ||
       !confirmPassword ? disabled = true : disabled = false;
       return (
-        <div>
-          <div>
+        <div id="signup-page">
+          <div className="back-link_div">
             <Link to="/">&laquo; Back</Link>
           </div>
           <div className="sign-up">
