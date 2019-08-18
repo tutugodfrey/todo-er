@@ -1,15 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import UserContext from './userContext';
+import Navigation from './Navigation';
+import LoginInline from './LoginInline';
 
 const Home = () => {
   return (
-    <div>
-      <div>
-        <h1>Don't leave any task uncompleted!</h1>
-        <div><strong id="story">Start using Todo-er</strong></div>
-        <div><Link to='/signup'>Sign Up</Link></div>
-        <div><Link to="/signin">Login here!</Link></div>
+    <div id="landing">
+        <Navigation />
+        <div id="showcase">
+          <div>
+          <div id="app-description">
+            <h1>Don't leave any task uncompleted!</h1>
+            <p id="story">Task marker let you keep track of your goals for the day</p>
+          </div>
+          <LoginInline />
+        </div>
       </div>
     </div>
   );
