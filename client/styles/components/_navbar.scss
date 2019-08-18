@@ -1,39 +1,15 @@
 #nav-bar {
-  @include container;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
   height: 40px;
   background: $primaryColor;
-  display: flex;
-  flex-direction: column;
-  #profile, #logout {
-    text-align: center;
-    width: 80px;
-    height: 40px;
-    position: absolute;
-    right: 10%;
-    a {
-      text-decoration: none;
-      color: $white;
-      position: absolute;
-      bottom: 5px;
-      @include center(80%, 'absolute');
-    }
-  }
-  #logout {
-    right: 0;
-  }
-
-  #new-todo {
-    text-align: center;
-    width: 90px;
-    height: 40px;
-    position: absolute;
-    right: 80px;
-    a {
-      text-decoration: none;
-      color: $white;
-      position: absolute;
-      bottom: 5px;
-      @include center(80%, 'absolute');
-    }
+  a {
+    text-decoration: none;
+    color: $white;
+    margin: 5px;
+    position: relative;
+    top: 20px;
+    font-weight: bold;
   }
 }

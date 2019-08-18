@@ -1,0 +1,36 @@
+#landing {
+  #nav-bar {
+    background: none;
+  }
+  background: url('public/background-image.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 5px;
+  min-height: 100vh;
+  #showcase {
+    position: relative;
+    top: 100px;
+    height: 400px;
+    > div {
+      position: relative;
+      background: rgba(0, 0, 0, .4);
+      @include center(102%);
+      height: 100%;
+      top: -25px;
+      #app-description {
+        position: relative;
+        top: 100px;
+        margin-bottom: 50px;
+        h1, #story {
+          text-align: center;
+          color: $white;
+        }
+      }
+      #login-inline {
+        position: relative;
+        top: 150px;
+      }
+    }
+  }
+}

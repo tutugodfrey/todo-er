@@ -2,8 +2,10 @@
 @import 'abstracts/functions';
 
 @import 'components/button';
+@import 'components/home';
 @import 'components/signup';
 @import 'components/signin';
+@import 'components/logininline';
 @import 'components/navbar';
 @import 'components/todos';
 @import 'components/consoleModal';
@@ -17,6 +19,7 @@ body {
   span[class=requiredFields] {
     color: $red;
   }
+  background: $primaryLight;
 }
 @include toggleElementDisplay;
 @include toggleElementVisibility;
