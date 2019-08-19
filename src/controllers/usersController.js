@@ -100,6 +100,18 @@ class UsersController  {
       })
       .catch(error => res.status(500).json(error))
   }
+
+  static getUser(req, res) {
+    let { userId } = req.body;
+    return users
+    .findById(userId)
+    .then(user => {
+      const retrievedUser = { ...user }
+      delete retrievedUser.password;
+      return res.status(200).json(retrievedUser);
+    })
+    .catch(error => res.status(500).json(error))
+  }
 }
 
 export default UsersController;

@@ -1,0 +1,85 @@
+#profile-page {
+  // border: 2px solid red;
+  $img-dim: 19%;
+  background: $primaryLight;
+  @include center(60%);
+  @include boxShadow($ambientBlack);
+  padding: 10px;
+  top: 20vh;
+  min-height: 60vh;
+  .profile-image_div {
+    margin-bottom: 10px;
+    // margin-top: -10px;
+    img {
+      width: $img-dim;
+      height: $img-dim;
+      position: relative;
+      @include center(19%);
+    }
+  }
+  #profile-info {
+    #profile-header_div {
+      height: 25px;
+      h3 {
+        position: relative;
+        top: -10px;
+        text-align: center;
+      }
+    }
+    .profile-details {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      strong {
+        margin-right: 3px;
+      }
+    }
+    #edit-profile-btn_div {
+      margin-top: 20px;
+      button {
+        @include center(30%);
+        @include borderRadius;
+        background: $green;
+        padding: $padding;
+        color: $white;
+        font-weight: bold;
+      }
+    }
+  }
+  #edit-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .input-group {
+      @include padding;
+      @include margin;
+      label {
+        margin-right: 3px;
+      }
+      input {
+        @include borderRadius;
+        @include padding;
+        border: none;
+        border: 1px solid $primaryColor;
+      }
+    }
+    #btn-group {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      button {
+        @include padding;
+        @include borderRadius;
+        @include margin;
+        width: 70px;
+      }
+      button#save-edit{
+        background: $green;
+        color: $white;
+      }
+      button#cancel-edit {
+        background: $red;
+      }
+    }
+  }
+}
