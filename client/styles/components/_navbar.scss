@@ -4,12 +4,32 @@
   justify-content: flex-end;
   height: 40px;
   background: $primaryColor;
-  a {
-    text-decoration: none;
-    color: $white;
-    margin: 5px;
+  div {
+    height: 25px;
     position: relative;
-    top: 20px;
-    font-weight: bold;
+    top: 10px;
+    margin-right: 7px;
+    a {
+      width: 100%;
+      display: block;
+      text-decoration: none;
+      color: $white;
+      margin: 5px;
+      position: relative;
+      top: 6px;
+      left: -10px;
+      text-align: center;
+      font-weight: bold;
+      transition: all 0.3s ease-in-out;
+    }
+    a:hover {
+      right: 0;
+      border-bottom: 2px solid $red;
+      color: $primaryColor;
+      background-color: $white;
+      @include borderRadius;
+      @include padding(3px);
+      top: -1px;
+    }
   }
 }

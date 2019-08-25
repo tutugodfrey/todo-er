@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import TodoForm from './TodoForm.jsx';
-import ConsoleModal from './ConsoleModal';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 import { request } from '../helpers';
@@ -158,11 +157,17 @@ class Todo extends Component {
   render() {
     const todos = this.props.todoStore.todos;
     const { showTodoForm, todoToEdit, editMode } = this.state;
+    const $editingTodo = editMode ? 'editing' : '';
     return (
       <div id="todos-container">
         <div id="todo-form_control">
           <div id="toggle-todo-form_div">
-              <button id='toggle-todoform_button' onClick={this.toggleTodoForm.bind(this)}>{showTodoForm ? 'Close Form': 'New Task'}</button>
+              <button
+                id='toggle-todoform_button'
+                onClick={this.toggleTodoForm.bind(this)}
+              >
+                {showTodoForm ? 'Close Form': 'New Task'}
+              </button>
           </div>
           { (!todos.length || showTodoForm) && <TodoForm /> }
         </div>
@@ -183,7 +188,10 @@ class Todo extends Component {
             return (
               <div className="todo" key={todo.id}>
                 <div className="todo-bar">
-                  <div id={`toggle-todo-${todo.id}-mini`} className="visible mini-todo-content">
+                  <div
+                    id={`toggle-todo-${todo.id}-mini`}
+                    className="visible mini-todo-content"
+                  >
                     <div className="todo-bar_title">{todo.title}</div>
                     <div>{todo.completed &&
                       <CompleteTodoCheckbox
@@ -193,51 +201,60 @@ class Todo extends Component {
                     </div>
                   </div>
                   <div>
-                    <button id={`toggle-todo-${todo.id}`} onClick={this.toggleTodoDisplay.bind(this)}>Show</button>
+                    <button
+                      id={`toggle-todo-${todo.id}`}
+                      onClick={this.toggleTodoDisplay.bind(this)}
+                    >Show</button>
                   </div>
                 </div>
                 <div id={`toggle-todo-${todo.id}-main`} className={'hide-item todos'}>
                   <li key={todo.id}>
                     <div>
                       <div>
-                        <strong>Title: </strong>
-                        {editing ?
+                      {editing ?
+                        <div id={$editingTodo}>
+                          <label className="item-label">Title: </label>
                           <input
                             value={todo.title}
                             name="title"
                             onChange={this.handleAddChange.bind(this)}
                           />
-                          : <span>{todo.title}</span>
+                        </div>
+                          : <h3>{todo.title}</h3>
                         }
                       </div>
                       <div>
-                        <strong>Description: </strong>
-                        {editing ?
+                      {editing ?
+                        <div>
+                          <label className="item-label">Description: </label>
                           <input
                             name="description"
                             value={todo.description}
                             onChange={this.handleAddChange.bind(this)}
                           />
-                          : <span>{todo.description}</span>
+                        </div>
+                          : <p>{todo.description}</p>
                         }
                       </div>
-                      <div>
-                        <strong>Links: </strong>
+                      <div id="links-div" className={$editingTodo}>
+                        <strong className="item-label">Links </strong>
                         <div>{todo.links && todo.links.length && todo.links.map((link, index)=> {
                           return (
                             <span key={index}>
                               {editing && <button
                                 onClick={event => this.removeLink(event, index)}
-                              >x
-                              </button>}
-                              <a href={link.url} target="_blank" rel="noopener noreferrer">{link.linkText || link.url}
+                              >x</button>}
+                              <a href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >{link.linkText || link.url}
                               </a><br />
                             </span>
                           );
                         })}
                         </div>
                       </div>
-                      <div>
+                      <div id="check-complete">
                         <CompleteTodoCheckbox
                           todo={todo}
                           toggleCompleted={this.toggleCompleted.bind(this)}
@@ -274,7 +291,7 @@ class Todo extends Component {
                       </div>
                       <button
                         type="button"
-                        className="edit-todo"
+                        className="edit-todo main-action"
                         id={`edit-todo-${todo.id}`}
                         onClick={event => this.toggleEditMode(event, todo)}
                       >
@@ -283,14 +300,14 @@ class Todo extends Component {
                       {editing &&
                         <button
                           type="button"
-                          className="save-todo-update"
+                          className="save-todo-update main-action"
                           id={`edit-todo-${todo.id}`}
                           onClick={this.updateTodo.bind(this)}
                         >Save</button>
                       }
                       <button
                         type="button"
-                        className="delete-todo"
+                        className="delete-todo main-action"
                         id={`edit-todo-${todo.id}`}
                         onClick={this.handleDeleteTodo.bind(this)}
                       >Delete</button>
@@ -303,8 +320,8 @@ class Todo extends Component {
           </ul>
         </div>
       </div>
-    )
-  }
+    );
+  };
 }
 
 export default compose(

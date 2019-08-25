@@ -4,13 +4,18 @@
   top: 20px;
   left: 20px;
   padding: 7px 10px;
-  @include boxShadow($ambientBlack);
-  background: $primaryLight;
+  @include boxShadow($gray);
+  background: $blue;
+  color: white;
   @include borderRadius;
   a {
     @include center(90%);
     text-decoration: none;
-    // padding: 20px 20px;
     color: $primaryColor;
+    color: white;
   }
+}
+
+.back-link_div:hover {
+  border: 1px solid $red;
 }
