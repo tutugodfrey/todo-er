@@ -3,7 +3,7 @@
   $img-dim: 19%;
   background: $primaryLight;
   @include center(60%);
-  @include boxShadow($ambientBlack);
+  @include boxShadow($shadowColor);
   padding: 10px;
   top: 20vh;
   min-height: 60vh;

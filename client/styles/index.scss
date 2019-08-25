@@ -11,10 +11,10 @@
 @import 'components/todos';
 @import 'components/consoleModal';
 @import 'components/profile';
-
 body {
   margin: 0;
   color: $black;
+  font-family: 'sans-serif, Arial Narrow', Arial;
   input[disabled][type=submit]{
     color: $black;
   }

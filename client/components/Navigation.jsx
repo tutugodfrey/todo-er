@@ -13,12 +13,18 @@ class Navigation extends Component {
       <div id="nav-bar">
         {isLoggedIn ? (
           <Fragment>
-          <div id="profile">
-            <Link to='./profile'>Profile</Link>
-          </div>
-          <div id="logout">
-            <a onClick={this.logout.bind(this)}>Log Out</a>
-          </div>
+            <div id="profile">
+              <Link to='/'>Home</Link>
+            </div>
+            <div id="profile">
+              <Link to='./dashboard'>Tasks</Link>
+            </div>
+            <div id="profile">
+              <Link to='./profile'>Profile</Link>
+            </div>
+            <div id="logout">
+              <a onClick={this.logout.bind(this)}>Log Out</a>
+            </div>
           </Fragment>
         ) : (
           <Fragment>

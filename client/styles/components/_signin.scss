@@ -2,7 +2,7 @@
   min-height: 100vh;
   background: $white;
   .sign-in {
-    @include boxShadow($ambientBlack);
+    @include boxShadow($shadowColor);
     position: relative;
     background: $primaryLight;
 
@@ -26,13 +26,24 @@
       @include center(80%);
       @include borderRadius;
       border: none;
-      @include boxShadow($ambientBlack);
+      @include boxShadow($shadowColor);
       padding: 5px;
     }
     input[type=submit] {
       @include center(50%);
       background-color: $primaryColor;
       color: $white;
+      transition: all 0.3s ease-out;
+    }
+    input[type=submit]:hover {
+      color: invert($color: #fff);
+      @include padding(7px);
+    }
+    a[href*=signup] {
+      text-decoration: none;
+    }
+    a[href*=signup]:hover {
+      text-decoration: underline;
     }
   }
 }

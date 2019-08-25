@@ -3,6 +3,7 @@ import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 import { Link } from 'react-router-dom';
 import { request } from '../helpers';
+import Navigation from './Navigation'
 
 class Profile extends React.Component {
   constructor() {
@@ -58,6 +59,7 @@ class Profile extends React.Component {
     const { name, email } = this.state.editUser
     return (
       <div>
+        <Navigation />
         <div className="back-link_div">
           <Link to="/dashboard">&laquo; Back</Link>
         </div>

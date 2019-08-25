@@ -7,7 +7,6 @@
     h3 {
       @include center(80%);
       text-align: center;
-      color: $primaryColor;
     }
   }
   #todo-form_control {
@@ -22,15 +21,20 @@
       button {
         border: none;
         color: $primaryColor;
-        @include boxShadow($ambientBlack);
+        @include boxShadow($shadowColor);
         padding: $padding;
         position: absolute;
         right: 10px;
         border-radius: $borderRadius;
+        transition: all 0.3s ease-out;
+      }
+      button:hover {
+        border: 1px solid $primaryColor;
+        padding: 7px;
       }
     }
     #todo-form_container {
-      @include boxShadow($ambientBlack);
+      @include boxShadow($shadowColor);
       background: transparentize($color: $primaryColor, $amount: 0.8);
       border-top-left-radius: $borderRadius;
       border-bottom-right-radius: $borderRadius;
@@ -60,6 +64,12 @@
             color: $white;
             margin-top: 10px;
             padding: 5px 0;
+            transition: all 0.3s ease-out;
+          }
+          > button:hover {
+            border: 1px solid $primaryColor;
+            padding: 7px;
+            color: invert($color: #fff)
           }
           input[disabled][type=submit], button[disabled][type=button] {
             color: $black;
@@ -88,7 +98,7 @@
     width: 90%;
     min-height: 20px;
     @include center (90%, '');
-    @include boxShadow($ambientBlack);
+    @include boxShadow($shadowColor);
     li {
       list-style: none;
     }
@@ -106,20 +116,68 @@
           padding: 3px;
           padding-top: 12px;
           font-weight: bold;
+          color: $primaryColor;
         }
       }
       button {
         @include button(50px, $white, $primaryColor);
         border-radius: $borderRadius;
-        height: 25px
+        height: 25px;
+        transition: all 0.3s ease-out;
+      }
+      button:hover {
+        border: 1px solid $primaryColor;
+        color: invert($color: $white)
       }
     }
     .todos {
+      h3 {
+        top: -30px;
+        color: $primaryColor;
+      }
+      p {
+        text-align: justify;
+        position: relative;
+        top: -30px;
+      }
+      #links-div {
+        position: relative;
+        top: -25px;
+        strong {
+          color: $black
+        }
+        a {
+          text-decoration: none;
+          color: $blue;
+        }
+        a:hover {
+          text-decoration: underline;
+        }
+      }
+      #check-complete {
+        position: relative;
+        top: -15px;
+      }
       margin-bottom: 10px;
       input {
         @include borderRadius;
         padding: 5px 3px;
       };
+      #editing {
+        @include margin;
+      }
+      .editing#links-div {
+        margin-top: 30px;
+        button {
+          margin-right: $margin;
+        }
+        button:hover {
+          color: $white;
+          background-color: $red;
+          @include borderRadius;
+          padding: 3px 7px;
+        }
+      }
       fieldset {
         margin-top: 5px;
         margin-bottom: 10px;
@@ -131,22 +189,36 @@
           padding: 3px;
           width: 60%;
         }
+        button:hover {
+          background-color: $green;
+          color: $white;
+          @include boxShadow($gray);
+          @include borderRadius;
+          @include padding;
+        }
       }
       button[class^=delete] {
         @include button(50px, $white, $red);
         border-radius: $borderRadius;
-        height: 25px
+        height: 25px;
+        transition: all 0.3s ease-out;
       }
       button[class^=edit] {
         @include button(50px, $white, $primaryColor);
         border-radius: $borderRadius;
         height: 25px;
+        transition: all 0.3s ease-out;
       }
 
       button[class~=save-todo-update] {
         @include button(50px, $white, $green);
         border-radius: $borderRadius;
         height: 25px;
+        transition: all 0.3s ease-out;
+      }
+      button.main-action:hover {
+        padding: 7px;
+        color: invert($color: #fff)
       }
     }
   }
