@@ -1,5 +1,10 @@
 # Todo-er
 Create simple  demo todo app with the data-modela npm package.
+## Status Badges
+
+[![CircleCI](https://circleci.com/gh/tutugodfrey/todo-er.svg?style=svg)](https://circleci.com/gh/tutugodfrey/todo-er)
+[![Maintainability](https://api.codeclimate.com/v1/badges/7293372337221c98bfdd/maintainability)](https://codeclimate.com/github/tutugodfrey/todo-er/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/7293372337221c98bfdd/test_coverage)](https://codeclimate.com/github/tutugodfrey/todo-er/test_coverage)
 
 ## Features & Routes
 - Users signup: `/api/users/signup`
