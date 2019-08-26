@@ -24,3 +24,9 @@ spec:
         image: tutug/todoapp:latest
         ports:
           - containerPort: 3005
+        livenessProbe:
+          exec:
+            command:
+            - ls
+          initialDelaySeconds: 5
+          periodSeconds: 5

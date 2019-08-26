@@ -9,6 +9,7 @@ class UsersController  {
     const salt = bcrypt.genSaltSync(saltRounds);
     const hash = bcrypt.hashSync(password, salt);
     req.body.password = hash;
+    delete req.body.confirmPassword;
     return users
       .create(req.body)
       .then(async (user) =>  {
@@ -17,7 +18,7 @@ class UsersController  {
           id,
           name,
           email,
-          username
+          username,
         });
         res.status(201).json({
           id,
@@ -58,7 +59,12 @@ class UsersController  {
           })
         }
       })
-      .catch(err => res.status(500).send(err))
+      .catch(err => {
+        if(err.message && err.message === 'user not found') {
+          return res.status(404).send(err)
+        };
+        return res.status(500).send(err);
+      });
   }
 
   static updateUser(req, res) {
@@ -73,30 +79,34 @@ class UsersController  {
       update
       )
       .then(user => {
-        const { name, username, email } = user
-        return res.status(200).json({
-          name,
-          email,
-          username,
-        })
+        const user_ = { ...user }
+        delete user_.password;
+        return res.status(200).json(user_)
       })
       .catch(err => res.status(500).json(err))
   }
 
   static getUsers(req, res) {
     return users
-      .findAll()
-      .then(allUsers => {
-        const result = allUsers.map(user => {
-          const { name, username, email,id } = user;
-          return {
-            id,
-            name,
-            username,
-            email
-          }
-        })
-        return res.status(200).json(result)
+      .findById(req.body.userId)
+      .then(result => {
+        if (!result.isAdmin) return res.status(401).json({
+          message: 'Access denied! Only an admin can view all users'
+        });
+        return users
+          .findAll()
+          .then(allUsers => {
+            const result = allUsers.map(user => {
+              const { name, username, email, id } = user;
+              return {
+                id,
+                name,
+                username,
+                email
+              }
+            })
+            return res.status(200).json(result)
+          })
       })
       .catch(error => res.status(500).json(error))
   }
@@ -111,6 +121,24 @@ class UsersController  {
       return res.status(200).json(retrievedUser);
     })
     .catch(error => res.status(500).json(error))
+  }
+
+  static deleteUser(req, res) {
+    let { id } = req.params;
+    return users
+      .destory({
+        id,
+      })
+      .then(res => {
+        return res.status(200).json({
+          message: 'user successfully deleted'
+        });
+      })
+      .catch(err => {
+        if (err.message && err.message === 'user not found')
+          return res.status(404).json(err);
+        return res.status(500).json(err)
+      })
   }
 }
 

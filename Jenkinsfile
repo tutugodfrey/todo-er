@@ -35,8 +35,8 @@ pipeline {
         echo env.JWT_SECRET
         sh """docker build \
           --build-arg JWT_SECRET=${env.JWT_SECRET} \
-          --build-arg PORT=${env.PORT || 3005} \
-          --build-arg API_URL=${env.API_URL || "http://localhost:3005/api"} \
+          --build-arg PORT=${env.PORT} \
+          --build-arg API_URL=${env.API_URL}q \
           -t ${params.Repo}/${params.Image} ."""
       }
     }

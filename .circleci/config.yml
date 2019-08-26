@@ -1,0 +1,38 @@
+version: 2.1
+jobs:
+  build:
+    environment:
+      # environment
+      CC_TEST_REPORTER_ID: 2bb20e058832f62485904001a0f1f6052dbc95561a97e7a9a6b060434b573a9d
+    docker:
+      - image: circleci/node:9.10.0
+    working_directory: ~/app
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies={{ checksum "package.json" }}
+            - v1-dependencies-
+      - run:
+          name: install dependencies
+          command:
+            npm install
+      - run:
+          name: Setup Code Climate test-reporter
+          command:
+          # download test reporter as a static binary
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter;
+            chmod +x ./cc-test-reporter;
+
+      - run:
+          name: Run tests and generate code coverage report with nyc
+          command:
+            ./cc-test-reporter before-build
+      - run:
+          name: Run Test
+          command:
+            npm run coverage
+      - run:
+          name: Send coverage report
+          command:
+            ./cc-test-reporter  after-build --coverage-input-type lcov

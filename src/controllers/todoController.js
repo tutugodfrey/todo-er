@@ -56,7 +56,11 @@ class TodoController {
       .then(todo => {
         return res.status(200).json(todo)
       })
-      .catch(err => res.status(200).json(err))
+      .catch(err => {
+        if (err.message && err.message === 'todo not found')
+          return res.status(404).json(err);
+        return res.status(500).json(err)
+      });
   }
 
   static deleteTodo(req, res) {
@@ -75,7 +79,11 @@ class TodoController {
         })
         .then(result => res.status(200).json(result))
       })
-      .catch(err => res.status(500).json(err))
+      .catch(err => {
+        if (err.message && err.message === 'todo not found, not action taken')
+          return res.status(404).json(err)
+        return res.status(500).json(err)
+      })
   }
 }
 

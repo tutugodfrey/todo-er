@@ -1,6 +1,7 @@
 import express from 'express';
 import UsersController from '../controllers/usersController';
 import TodoController from '../controllers/todoController';
+import { authValidator, todoValidator } from '../middlewares/validation';
 import { authUser } from '../helpers'
 
 const router = express.Router();
@@ -12,14 +13,15 @@ router.get('/', (req, res) => {
 });
 
 // create new user
-router.post('/users/signup', UsersController.signUp);
-router.post('/users/signin', UsersController.signIn);
+router.post('/users/signup', authValidator.signup, UsersController.signUp);
+router.post('/users/signin', authValidator.signin, UsersController.signIn);
 router.put('/users', authUser, UsersController.updateUser);
-router.get('/users', UsersController.getUsers);
-router.get('/user', authUser, UsersController.getUser)
+router.get('/users', authUser, UsersController.getUsers);
+router.get('/user', authUser, UsersController.getUser);
+router.delete('/users/:id', UsersController.deleteUser)
 
 // todo routes
-router.post('/todos', authUser, TodoController.createTodo);
+router.post('/todos', authUser, todoValidator.createTodo, TodoController.createTodo);
 router.get('/todos', authUser, TodoController.getTodos);
 router.get('/todos/:id', authUser, TodoController.getTodo);
 router.put('/todos/:id', authUser, TodoController.updateTodo);
