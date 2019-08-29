@@ -3,12 +3,14 @@ const webpack = require('webpack');
 const dotenv = require('dotenv-safe');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = () => {
-  const env = dotenv.config().parsed;
+module.exports = (env) => {
+  // const env = dotenv.config().parsed;
   const envKeys = Object.keys(env).reduce((prev, next) => {
     prev[`process.env.${next}`] = JSON.stringify(env[next]);
     return prev;
   }, {});
+  console.log(env)
+  // const envKeys = env
   console.log(envKeys, 'envKeys')
   return {
     devtool: 'inline-source-map',
@@ -28,7 +30,13 @@ module.exports = () => {
           test: /\.(scss|sass)$/,
           exclude: /ndoe_modules/,
           use: ['style-loader', 'css-loader?url=false', 'sass-loader']
-        }
+        }, {
+          test: /\.(png|jpg|jpeg)$/,
+          use: [{
+            loader: 'url-loader',
+            options: { limit: 3000000 },
+          }],
+        },
       ]
     },
     devServer: {

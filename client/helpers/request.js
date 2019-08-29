@@ -1,5 +1,6 @@
 
 const request = async (route, method = 'GET', data = {}) => {
+  console.log(process.env.API_URL, 'API_URL');
   const baseUrl = process.env.API_URL || 'http://localhost:3005/api';
   let res
   if (method === 'GET') {

@@ -9,6 +9,7 @@ spec:
   selector:
     matchLabels:
       app: todoapp
+  minReadySeconds: 5
   strategy:
     type: RollingUpdate
     rollingUpdate:
