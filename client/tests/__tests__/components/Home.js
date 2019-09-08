@@ -1,70 +1,22 @@
 import React from 'react';
-import { shallow, mount } from 'enzyme';
-import { shape } from 'prop-types'
-import Home from '../../../components/Home.jsx';
-import { Link, MemoryRouter  } from 'react-router-dom';
-import { exportAllDeclaration } from '@babel/types';
+import { Home } from '../../../components/Home.jsx';
 
-const options = {
-  context: {
-    router: {
-      history: {
-        push: jest.fn(),
-        replace: jest.fn(),
-        createHref: jest.fn(),
-      },
-      route: {
-        location: {
-          hash: '',
-          pathname: '',
-          search: '',
-          state: '',
-        },
-        match: {
-          params: {},
-          isExact: false,
-          path: '',
-          url: '',
-        },
-      },
-    },
-  },
-  childContextTypes: {
-    router: shape({
-      route: shape({
-        location: shape(),
-        match: shape(),
-      }),
-      history: shape({}),
-    }),
-  },
-};
-
-let wrapper
+let wrapper = shallow(<Home />);
 describe('<Home /> component test', () => {
-  // beforeAll(() => {
-  //   wrapper = mount(<MemoryRouter>
-  //     <Home />
-  //     </MemoryRouter>);
-  // });
-  it('random', () => {
-    expect(true).toBe(true)
-  })
+  it('should find the welcome message', () => {
+    const heading = wrapper.find('h1');
+    expect(heading.text()).toBe('Don\'t leave any task uncompleted!')
+  });
 
-  // it('should find the welcome message', () => {
-  //   const heading = wrapper.find('h1');
-  //   expect(heading.text()).toBe('Don\'t leave any task uncompleted!')
-  // });
+  test('should find info heading', () => {
+    const vara = wrapper.find('#story');
+    expect(vara.type()).toBe('p');
+    expect(vara.text()).toBe('Task marker let you keep track of your goals for the day');
+  });
 
-  // test('should find info heading', () => {
-  //   const vara = wrapper.find('#story');
-  //   expect(vara.type()).toBe('strong');
-  //   expect(vara.text()).toBe('Start using Todo-er');
-  // });
-
-  // test('should find the signup link', () => {
-  //   const signup = wrapper.find(Link).first();
-  //   expect(signup.text()).toBe('Sign Up')
-  //   signup.simulate('click')
-  // })
-})
+  test('should find the LoginInline component', () => {
+    expect(wrapper.children().at(1).children().childAt(1).name())
+      .toBe('inject-withRouter(LoginInline)-with-userStore');
+      expect(wrapper.childAt(0).name()).toBe('withRouter(Navigation)');
+  });
+});
