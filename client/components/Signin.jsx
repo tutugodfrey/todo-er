@@ -7,7 +7,7 @@ import { request, closeConsole } from '../helpers';
 import ConsoleModal from './ConsoleModal';
 
 
-class Signin extends Component {
+export class SignIn extends Component {
   constructor() {
     super()
     this.closeConsole = closeConsole.bind(this)
@@ -43,6 +43,7 @@ class Signin extends Component {
     }
     if (allFieldPass) {
       const createdUser =  await request('/users/signin', 'POST', this.state.user);
+
       if (createdUser.message) {
         const { message } = createdUser;
         let errorMessage = message;
@@ -50,10 +51,11 @@ class Signin extends Component {
           errorMessage =
             'Unsuccessful login! Please check your username and password'
         }
+        // console.log(errorMessage)
         this.setState({
+          ...this.state,
           consoleMessage: errorMessage,
         })
-        console.log(createdUser.message)
         return null;
       }
       localStorage.setItem('token', createdUser.token)
@@ -63,7 +65,7 @@ class Signin extends Component {
   }
 
   render() {
-    let disableSubmit
+    let disableSubmit;
     const { password, username } = this.state.user;
     const { consoleMessage } = this.state;
     !password || !username ? disableSubmit = true : disableSubmit = false;
@@ -91,7 +93,7 @@ class Signin extends Component {
                 <input
                   type="text"
                   name="username"
-                  value={username}
+                  value={this.state.user.username}
                   onChange={this.handleChange}
                 />
               </div>
@@ -104,7 +106,7 @@ class Signin extends Component {
                 <input 
                   type="password"
                   name="password"
-                  value={password}
+                  value={this.state.user.password}
                   onChange={this.handleChange}
                   />
               </div>
@@ -113,6 +115,7 @@ class Signin extends Component {
               <div>
                 <input
                   type="submit"
+                  id="submitLogin"
                   onClick={this.onSignIn}
                   disabled={disableSubmit}
                   value="Sign In"
@@ -122,7 +125,7 @@ class Signin extends Component {
           </form>
           <div>
             <p>I don't have an account!
-              <Link to="/signup"> Sign Up</Link></p>
+              <Link to="/signup">Sign Up</Link></p>
           </div>
         </div>
       </div>
@@ -134,4 +137,4 @@ export default compose(
   inject('userStore'),
   observer,
   withRouter,
-)(Signin);
+)(SignIn);

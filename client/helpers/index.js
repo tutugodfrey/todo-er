@@ -12,9 +12,7 @@ function closeConsole (event) {
 const logout = (event) => {
   // localStorage.clear();
   // event.preventDefault()
-  console.log('what sup')
   return <Redirect to="/signin" />
-
 }
 
 export {

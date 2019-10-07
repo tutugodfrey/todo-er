@@ -7,7 +7,7 @@ import { request, closeConsole } from '../helpers';
 import ConsoleModal from './ConsoleModal';
 
 
-class LoginInline extends Component {
+export class LoginInline extends Component {
   constructor() {
     super()
     this.closeConsole = closeConsole.bind(this)

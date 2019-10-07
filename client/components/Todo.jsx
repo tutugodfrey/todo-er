@@ -14,7 +14,7 @@ const CompleteTodoCheckbox = ({ todo, toggleCompleted }) => (
   />
 )
 
-class Todo extends Component {
+export class Todo extends Component {
   constructor() {
     super()
     this.toggleCompleted = this.toggleCompleted.bind(this)
@@ -162,17 +162,19 @@ class Todo extends Component {
       <div id="todos-container">
         <div id="todo-form_control">
           <div id="toggle-todo-form_div">
+            {todos.length ? (
               <button
                 id='toggle-todoform_button'
                 onClick={this.toggleTodoForm.bind(this)}
               >
                 {showTodoForm ? 'Close Form': 'New Task'}
               </button>
+            ) : null}
           </div>
           { (!todos.length || showTodoForm) && <TodoForm /> }
         </div>
-        <div>
-          <h3>{todos.length ? 'Your Todos' : 'No Todos! Start adding your tasks'}</h3>
+        <div id="todos-content_div">
+          <h3>{ todos.length ? 'Your Todos' : 'No Todos! Start adding your tasks' }</h3>
           <ul>
           {todos && todos.map(mainTodo => {
             let editing;

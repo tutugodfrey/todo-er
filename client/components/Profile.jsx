@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { request } from '../helpers';
 import Navigation from './Navigation'
 
-class Profile extends React.Component {
+export class Profile extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -63,67 +63,67 @@ class Profile extends React.Component {
         <div className="back-link_div">
           <Link to="/dashboard">&laquo; Back</Link>
         </div>
-      <div id="profile-page">
-        {this.state.editMode && (
-          <div id="edit-profile">
-            <div className="profile-image_div">
-              <img src={user.imgUrl || "public/default-profile.png"}/>
-            </div>
-            <div className="input-group">
-              <label>Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={name}
-                onChange={this.onEditText}
-              />
-            </div>
-            <div className="input-group">
-              <label>Email:</label>
-              <input
-                type="text"
-                name="email"
-                value={email}
-                onChange={this.onEditText}
-              />
-            </div>
-            <div id="btn-group">
-              <div>
-                <button type="button" id="save-edit" onClick={this.onSaveUpdate}
-                >Save</button>
+        <div id="profile-page">
+          {this.state.editMode && (
+            <div id="edit-profile">
+              <div className="profile-image_div">
+                <img src={user.imgUrl || "public/default-profile.png"}/>
               </div>
-              <div>
-                <button type="button" id="cancel-edit" onClick={this.toggleEditMode}
-                >Cancel</button>
+              <div className="input-group">
+                <label>Name:</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={name}
+                  onChange={this.onEditText}
+                />
+              </div>
+              <div className="input-group">
+                <label>Email:</label>
+                <input
+                  type="text"
+                  name="email"
+                  value={email}
+                  onChange={this.onEditText}
+                />
+              </div>
+              <div id="btn-group">
+                <div>
+                  <button type="button" id="save-edit" onClick={this.onSaveUpdate}
+                  >Save</button>
+                </div>
+                <div>
+                  <button type="button" id="cancel-edit" onClick={this.toggleEditMode}
+                  >Cancel</button>
+                </div>
               </div>
             </div>
-          </div>
-        )}
-        {!this.state.editMode && (
-          <div id="profile-info">
-            <div id="profile-header_div">
-              <h3>{user.name}</h3>
+          )}
+          {!this.state.editMode && (
+            <div id="profile-info">
+              <div id="profile-header_div">
+                <h3>{user.name}</h3>
+              </div>
+              <div className="profile-image_div" id="profile-image_div">
+                <img src={user.imgUser || 'public/default-profile.png'} />
+              </div>
+              <div className="profile-details">
+                <div><strong>Email:</strong></div>
+                <div><span>{user.email}</span></div>
+              </div>
+              <div className="profile-details">
+                <div><strong>Username:</strong></div>
+                <div><span>{user.username}</span></div>
+              </div>
+              <div id="edit-profile-btn_div">
+                <button
+                type="button"
+                onClick={this.toggleEditMode}
+                >Edit</button>
+              </div>
             </div>
-            <div className="profile-image_div" id="profile-image_div">
-              <img src={user.imgUser || 'public/default-profile.png'} />
-            </div>
-            <div className="profile-details">
-              <div><strong>Email:</strong></div>
-              <div><span>{user.email}</span></div>
-            </div>
-            <div className="profile-details">
-              <div><strong>Username:</strong></div>
-              <div><span>{user.username}</span></div>
-            </div>
-            <div id="edit-profile-btn_div">
-              <button
-              type="button"
-              onClick={this.toggleEditMode}
-              >Edit</button>
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
       </div>
     );
   }

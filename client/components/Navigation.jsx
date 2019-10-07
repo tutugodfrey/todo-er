@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { Link, withRouter } from 'react-router-dom';
 
-class Navigation extends Component {
+export class Navigation extends Component {
   logout() {
     localStorage.clear();
     return this.props.history.push('/signin')
@@ -13,10 +13,10 @@ class Navigation extends Component {
       <div id="nav-bar">
         {isLoggedIn ? (
           <Fragment>
-            <div id="profile">
+            <div id="home">
               <Link to='/'>Home</Link>
             </div>
-            <div id="profile">
+            <div id="dashboard">
               <Link to='./dashboard'>Tasks</Link>
             </div>
             <div id="profile">
