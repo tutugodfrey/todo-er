@@ -4,7 +4,7 @@ export default {
     description: 'todo1 description',
     links: [
       { url: 'linkurl1' },
-      { url: 'linkurl2', linkText: 'linkText2' }
+      { url: 'www.google.com', linkText: 'Visit Google' }
     ],
   },
   todo2: {

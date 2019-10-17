@@ -71,7 +71,6 @@ describe('User Test', () => {
   });
   describe('Create New User', () => {
     it('should not create without password', () => {
-      console.l
       const user = {...testUsers.user1}
       delete user.password;
       delete user.confirmPassword;
