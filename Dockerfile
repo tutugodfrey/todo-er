@@ -50,6 +50,7 @@ COPY package.json /app/
 
 RUN npm install --production
 COPY --from=build /app/public ./public
+COPY public/background-image.jpg ./public
 COPY src ./src
 # COPY .env ./
 COPY .env.example ./
