@@ -71,9 +71,6 @@
             padding: 7px;
             color: invert($color: #fff)
           }
-          input[disabled][type=submit], button[disabled][type=button] {
-            color: $black;
-          }
           fieldset {
             margin-top: 5px;
             @include borderRadius;

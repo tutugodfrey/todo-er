@@ -15,8 +15,8 @@ body {
   margin: 0;
   color: $black;
   font-family: 'sans-serif, Arial Narrow', Arial;
-  input[disabled][type=submit]{
-    color: $black;
+  input[disabled][type=submit], button[disabled]{
+    opacity: 0.6;
   }
   span[class=requiredFields] {
     color: $red;
