@@ -186,7 +186,6 @@ export class Todo extends Component {
               editing = false;
               todo = mainTodo
             }
-
             return (
               <div className="todo" key={todo.id}>
                 <div className="todo-bar">
@@ -239,7 +238,7 @@ export class Todo extends Component {
                         }
                       </div>
                       <div id="links-div" className={$editingTodo}>
-                        <strong className="item-label">Links </strong>
+                        <strong className="item-label">{todo.links && todo.links.length ? 'Links' : null}</strong>
                         <div>{todo.links && todo.links.length && todo.links.map((link, index)=> {
                           return (
                             <span key={index}>
@@ -253,7 +252,7 @@ export class Todo extends Component {
                               </a><br />
                             </span>
                           );
-                        })}
+                        }) || null}
                         </div>
                       </div>
                       <div id="check-complete">
