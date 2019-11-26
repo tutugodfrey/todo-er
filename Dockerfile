@@ -52,6 +52,9 @@ RUN npm install --production
 COPY --from=build /app/public ./public
 COPY public/background-image.jpg ./public
 COPY src ./src
+COPY helpers ./helpers
+COPY setup ./setup
+COPY jest.config.js ./jest.config.js
 # COPY .env ./
 COPY .env.example ./
 COPY .babelrc ./
