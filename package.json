@@ -12,7 +12,7 @@
   "scripts": {
     "webpack": "webpack",
     "test": "npm run test:server && npm run test:client",
-    "test:client": "jest",
+    "test:client": "jest ./client/tests/__tests__",
     "test:server": "mocha -r esm src/test",
     "e2e": "npm start & mocha -r esm client/tests/e2e/tests && pkill node",
     "e2e2": "npm run build; npm start & mocha -r esm client/tests/e2e/tests; kill $(lsof -ti :3005)",

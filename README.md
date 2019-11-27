@@ -34,7 +34,7 @@ Note the API_URL should be the base url that frontend app will run on. if your a
 
 ### Examples
 #### using build-arg
-- $ docker build --build-arg JWT_SECRET=somethingfish --build-arg port=3005  -t newtodo:latest 
+- $ docker build --build-arg JWT_SECRET=somethingfishing --build-arg port=3005  -t todoapp:latest 
 - API_URL=http://localhost:3005/api  --- change the port to your desired port and make the API_URL available in our .env file
 
 #### Using Jenkin build
