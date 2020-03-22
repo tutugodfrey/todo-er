@@ -10,22 +10,24 @@ class UsersController  {
     const hash = bcrypt.hashSync(password, salt);
     req.body.password = hash;
     delete req.body.confirmPassword;
+    req.body.imgUrl = req.body.imgUrl || ''
     return users
       .create(req.body)
       .then(async (user) =>  {
-        const { name, username, email, id } = user;
+        const { name, username, email, id, imgUrl } = user;
         const token = await genToken({
           id,
           name,
           email,
           username,
         });
-        res.status(201).json({
+        return res.status(201).json({
           id,
           name,
           email,
           username,
-          token
+          token,
+          imgUrl,
         });
       })
       .catch(err =>  res.status(500).send(err))
@@ -42,7 +44,7 @@ class UsersController  {
       })
       .then(async user => {
         const verifyUser = bcrypt.compareSync(password, user.password);
-        const { name, username, email, id } = user;
+        const { name, username, email, id, imgUrl } = user;
         if (verifyUser) {
           const token = await genToken({
             id,
@@ -55,6 +57,7 @@ class UsersController  {
             name,
             username,
             email,
+            imgUrl,
             token
           })
         }
@@ -97,13 +100,8 @@ class UsersController  {
           .findAll()
           .then(allUsers => {
             const result = allUsers.map(user => {
-              const { name, username, email, id } = user;
-              return {
-                id,
-                name,
-                username,
-                email
-              }
+              delete user.password
+              return user
             })
             return res.status(200).json(result)
           })
@@ -139,6 +137,26 @@ class UsersController  {
           return res.status(404).json(err);
         return res.status(500).json(err)
       })
+  }
+
+  static uploadPhoto(req, res) {
+    const { profilePhoto, userId } = req.body;
+    return users
+    .update({
+      where: {
+        id: userId
+      }
+    },
+    {
+      imgUrl: profilePhoto || ''
+    }
+    )
+    .then(user => {
+      const user_ = { ...user }
+      delete user_.password;
+      return res.status(200).json(user_)
+    })
+    .catch(err => res.status(500).json(err))
   }
 }
 

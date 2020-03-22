@@ -11,6 +11,16 @@ const request = async (route, method = 'GET', data = {}) => {
           token: localStorage.getItem('token') || null
         },
       })
+  } else if (data instanceof FormData) {
+    res = await fetch(baseUrl +route,
+      {
+        method: method,
+        enctype: "multipart/form-data",
+        headers: {
+          token: localStorage.getItem('token') || null
+        },
+        body: data
+      })
   } else {
     res = await fetch(baseUrl + route,
       {

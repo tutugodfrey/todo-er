@@ -1,20 +1,55 @@
 #profile-page {
-  // border: 2px solid red;
-  $img-dim: 19%;
+  $img-dim: 20%;
   background: $primaryLight;
   @include center(60%);
   @include boxShadow($shadowColor);
   padding: 10px;
+  padding-bottom: 30px;
   top: 20vh;
   min-height: 60vh;
   .profile-image_div {
     margin-bottom: 10px;
-    // margin-top: -10px;
     img {
       width: $img-dim;
       height: $img-dim;
       position: relative;
       @include center(19%);
+      @include boxShadow($shadowColor);
+      @include borderRadius(15%)
+    }
+
+    button, input {
+      background: $green;
+      color: $white;
+      font-size: 1em;
+      margin-top: 10px;
+      @include borderRadius;
+      @include center(20%);
+      @include padding(5px);
+    }
+    input[type=file] {
+      background: $gray;
+    } 
+    button.dark {
+      background: $black;
+      margin-bottom: 30px;
+    }
+    button.red{
+      background: $red;
+      margin-bottom: 30px;
+    }
+    span.pop-up {
+      left: 50%;
+      top: 120px;
+      background: $primaryColor;
+      color: $white;
+      @include padding(15px);
+      @include center(30%, fixed);
+      z-index: 1000;
+      @include boxShadow($shadowColor);
+      @include borderRadius;
+      text-align: center;
+      
     }
   }
   #profile-info {

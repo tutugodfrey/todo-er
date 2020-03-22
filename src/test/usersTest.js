@@ -123,6 +123,7 @@ describe('User Test', () => {
           expect(res.body).to.have.property('token')
           expect(res.body).to.have.property('username')
             .to.equal(user.username);
+          expect(res.body).to.have.property('imgUrl').to.equal('')
           user1 = {...res.body }
         });
     });
@@ -136,6 +137,7 @@ describe('User Test', () => {
         expect(res.body).to.have.property('token')
         expect(res.body).to.have.property('username')
           .to.equal(user.username);
+        expect(res.body).to.have.property('imgUrl').to.equal('')
         user2 = {...res.body }
       });
     });
@@ -180,6 +182,7 @@ describe('User Test', () => {
         expect(res.body).to.have.property('token');
         expect(res.body).to.have.property('username')
           .to.equal(user1.username);
+        expect(res.body).to.have.property('imgUrl').to.equal('');
       });
     });
   });
@@ -194,6 +197,8 @@ describe('User Test', () => {
           .to.equal(user1.username); 
         expect(res.body).to.have.property('email')
           .to.equal(user1.email);
+        expect(res.body).to.have.property('imgUrl').to.equal('');
+
       })
     });
     it('should get a with the supplied token', () => {
@@ -205,6 +210,7 @@ describe('User Test', () => {
           .to.equal(user2.username); 
         expect(res.body).to.have.property('email')
           .to.equal(user2.email);
+        expect(res.body).to.have.property('imgUrl').to.equal('');
       });
     });
 

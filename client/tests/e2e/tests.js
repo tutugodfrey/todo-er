@@ -11,6 +11,7 @@ import {
   dashboard,
   profilePage,
 } from './pageObjects';
+import uploadImage from '../../../src/middlewares/fileupload';
 
 dotenv.config();
 const { expect } = chai;
@@ -77,19 +78,21 @@ describe('Integration testing', () => {
       expect(profile.email).to.equal(user1.email);
     });
 
-    it('should edit user profile', async () => {
+    it('should edit user profile and cancel', async () => {
       const editProfile = await profilePage.editProfileAndCancel();
       expect(editProfile.editBtnName).to.equal('Edit');
       expect(editProfile.cancelBtnName).to.equal('Cancel');
     });
 
-    it('should edit user profile', async () => {
+    it('should edit user profile and save', async () => {
       const editProfile = await profilePage.editProfileAndSave();
       const profile = await profilePage.navToProfile();
       expect(editProfile.saveBtnName).to.equal('Save');
       expect(profile.name).to.equal(editUser1.name);
       expect(profile.username).to.equal(user1.username);
       expect(profile.email).to.equal(editUser1.email);
+      const res = await profilePage.changeProfilePhoto();
+      expect(res).to.equal(null);
     });
 
     it('should logout user', () => {
@@ -98,7 +101,7 @@ describe('Integration testing', () => {
 
     it('should log user in', async () => {
       const signin = await signinPage.signin();
-      expect(signin.signinFormHeader).to.equal('Sign In')
+      expect(signin.signinFormHeader).to.equal('Sign In');
     });
 
     it('should logout user', async () => {
@@ -109,7 +112,6 @@ describe('Integration testing', () => {
 
     it('should signin using inline login', async () => {
       await base.waitUntilHomePageLoad()
-      return signinPage.inLineSignin(user1.username, user1.password)
-    })
+      return signinPage.inLineSignin(user1.username, user1.password);
+    });
 });
-
