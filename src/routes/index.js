@@ -3,6 +3,7 @@ import UsersController from '../controllers/usersController';
 import TodoController from '../controllers/todoController';
 import { authValidator, todoValidator } from '../middlewares/validation';
 import { authUser } from '../helpers'
+import upload, { handleUploadedImage } from '../middlewares/fileupload';
 
 const router = express.Router();
 
@@ -18,7 +19,8 @@ router.post('/users/signin', authValidator.signin, UsersController.signIn);
 router.put('/users', authUser, UsersController.updateUser);
 router.get('/users', authUser, UsersController.getUsers);
 router.get('/user', authUser, UsersController.getUser);
-router.delete('/users/:id', UsersController.deleteUser)
+router.delete('/users/:id', UsersController.deleteUser);
+router.post('/users/photo', authUser, upload.single('profilePhoto'),  handleUploadedImage, UsersController.uploadPhoto);
 
 // todo routes
 router.post('/todos', authUser, todoValidator.createTodo, TodoController.createTodo);

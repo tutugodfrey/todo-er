@@ -72,5 +72,9 @@ export default {
     editProfileInputEmail: By.css('div#edit-profile input[name="email"]'),
     saveEditBtn: By.css('#save-edit'),
     cancelEditBtn: By.css('#cancel-edit'),
+    changeProfilePhotoBtn: By.css('#change-profile-photo'),
+    fileInputField: By.css('input[name=profile-photo]'),
+    uploadBtn: By.css('button[class=show]'),
+    profileImgSuccessModal: By.css('#profile-photo-save-success'),
   }
 }

@@ -1,4 +1,9 @@
 node_modules
 .env
-public/bundle.js
-public/index.html
+public/*
+!public/default-profile.png
+!public/backgroud-image.jpg
+.ebextensions
+.elasticbeanstalk
+eb-tododer.zip
+terraform

@@ -1,9 +1,5 @@
 export default {
   signup: (req, res, next) => {
-    const {
-      password,
-      name,
-    } = req.body;
     let count = 0
     const fields = ['password', 'name', 'email', 'username'];
     fields.forEach(field => {

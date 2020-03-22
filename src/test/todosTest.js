@@ -62,7 +62,7 @@ describe('Todos Test', () => {
       .send(user1_)
       .then(res => {
         user1 = { ...res.body }
-      })
+      });
   });
   describe('Create Todo', () => {
     it('should not create todo without title', () => {

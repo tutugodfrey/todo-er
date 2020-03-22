@@ -15,9 +15,14 @@ const authUser = async (req, res, next) => {
   const token = req.headers.token;
   if (!token) return res.status(401).json({ message: 'Please provide a token' });
   try {
-    // console.log(token)
+
     const decoded = jwt.verify(token, JWT_SECRET);
     req.body.userId = decoded.user.id;
+
+    // temp hold user obj when unloading files
+    req.userObj = {
+      userId: decoded.user.id,
+    }
     return next()
   } catch(err) {
     // err

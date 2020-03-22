@@ -65,8 +65,15 @@ describe('Profile component test', () => {
     test('should render image', () => {
       expect(childrenInfo.at(1).props().id).toBe('profile-image_div');
       expect(childrenInfo.at(1).name()).toBe('div');
-      expect(childrenInfo.at(1).children().type()).toBe('img');
-      expect(childrenInfo.at(1).children().props().src).toBe('public/default-profile.png');
+      expect(childrenInfo.at(1).children().at(0).type()).toBe('img');
+      expect(childrenInfo.at(1).children().at(0).props().src).toBe('public/default-profile.png');
+      expect(childrenInfo.at(1).children().at(3).name()).toBe('button');
+      expect(childrenInfo.at(1).children().at(3).props().children).toBe('Change');
+      wrapper.find('#change-profile-photo').simulate('click');
+      expect(wrapper.find('#profile-image_div').children().at(3).type()).toBe('input')
+      expect(wrapper.find('#profile-image_div').children().at(3).props().type).toBe('file')
+      expect(wrapper.find('#profile-image_div').children().at(5).type()).toBe('button')
+      expect(wrapper.find('#profile-image_div').children().at(5).text()).toBe('Cancle')
     });
 
     test('should render email', () => {

@@ -1,6 +1,7 @@
 import selectors from './selectors';
 import Base from './base';
 import { testUsers } from '../../../../helpers';
+import { profilePage } from '.';
 
 const base = Base();
 const { dashboard, profile } = selectors;
@@ -51,5 +52,12 @@ export default {
     return {
       saveBtnName
     }
-  }
+  },
+  changeProfilePhoto: async () => {
+    const changeProfilePhotoBtn = await base.find(profile.changeProfilePhotoBtn);
+    await changeProfilePhotoBtn.click();
+    await base.find(profile.fileInputField).sendKeys('/Users/godfreytutu/Desktop/projects/todo-er/public/profilePhoto-1.jpg');
+    await base.find(profile.uploadBtn).click();
+    return null;
+  },
 }
