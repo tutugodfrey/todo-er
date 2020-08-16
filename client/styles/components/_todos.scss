@@ -151,6 +151,17 @@
           text-decoration: underline;
         }
       }
+      #deadline {
+        position: relative;
+        height: 50px;
+        width: 30%;
+        top: -10px;
+        margin-bottom: 10px;
+        padding: 3px;
+        >div div {
+          margin-top:3px;
+        }
+      }
       #check-complete {
         position: relative;
         top: -15px;

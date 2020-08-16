@@ -17,7 +17,8 @@ const CompleteTodoCheckbox = ({ todo, toggleCompleted }) => (
 export class Todo extends Component {
   constructor() {
     super()
-    this.toggleCompleted = this.toggleCompleted.bind(this)
+    this.toggleCompleted = this.toggleCompleted.bind(this);
+    this.formatDate = this.formatDate.bind(this);
     this.state = {
       link: {
         url: '',
@@ -154,6 +155,12 @@ export class Todo extends Component {
     }
   }
 
+  formatDate(timestamp) {
+    if (!timestamp) return null
+    let date = new Date(timestamp).toString().split(' ');
+    return `${date[0]} ${date[1]} ${date[2]}, ${date[3]} `
+  }
+
   render() {
     const todos = this.props.todoStore.todos;
     const { showTodoForm, todoToEdit, editMode } = this.state;
@@ -254,6 +261,15 @@ export class Todo extends Component {
                           );
                         }) || null}
                         </div>
+                      </div>
+
+                      <div id="deadline">
+                        {
+                        todo.timestamp? <div>
+                            <strong>Target date</strong>
+                            <div>{this.formatDate(todo.timestamp)}</div>
+                          </div> : null
+                        }
                       </div>
                       <div id="check-complete">
                         <CompleteTodoCheckbox

@@ -2,8 +2,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Routes from './Routes.jsx';
 import { Provider } from 'mobx-react';
-import store from './store'
-import './styles/index.scss'
+import store from './store';
+import './styles/index.scss';
+
 const App = (props) => {
   return (
     <div>
