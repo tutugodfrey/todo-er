@@ -1,29 +1,5 @@
 import React, { Component } from 'react';
 
-const monthDays = {
-  1: [31, 'Jan'],
-  2: [28, 'Feb'],
-  3: [31, 'Mar',],
-  4: [30, 'April'],
-  5: [31, 'May'],
-  6: [30, 'Jun'],
-  7: [31, 'Jul'],
-  8: [31, 'Aug'],
-  9: [30, 'Sep'],
-  10: [31, 'Oct'],
-  11: [30, 'Nov'],
-  12: [31, 'Dec']
-};
-const weekDayss = {
-  0: 'Sun',
-  1: 'Mon',
-  2: 'Tue',
-  3: 'Wed',
-  4: 'Thu',
-  5: 'Fri',
-  6: 'Sat',
-};
-
 class Calender extends Component {
   constructor() {
     super()
@@ -36,6 +12,29 @@ class Calender extends Component {
       daysDataCollector: [],
       indexOfSelectedDate: -1,
       milisecondsInDay: 86400000,
+      monthObj: {
+        1: [31, 'Jan'],
+        2: [28, 'Feb'],
+        3: [31, 'Mar',],
+        4: [30, 'April'],
+        5: [31, 'May'],
+        6: [30, 'Jun'],
+        7: [31, 'Jul'],
+        8: [31, 'Aug'],
+        9: [30, 'Sep'],
+        10: [31, 'Oct'],
+        11: [30, 'Nov'],
+        12: [31, 'Dec']
+      },
+      weekObj: {
+        0: 'Sun',
+        1: 'Mon',
+        2: 'Tue',
+        3: 'Wed',
+        4: 'Thu',
+        5: 'Fri',
+        6: 'Sat',
+      },
     }
     this.moveYearBackward = this.moveYearBackward.bind(this);
     this.moveYearForward = this.moveYearForward.bind(this);
@@ -49,24 +48,26 @@ class Calender extends Component {
     event.preventDefault();
     const milisecondsInYear = this.state.milisecondsInDay * 365;
     if (this.state.year > this.state.currentYear) {
-      this.generateCalendar(this.state.pickedDateTimestamp - milisecondsInYear);
-      this.setState({
-        ...this.state,
-        year: this.state.year - 1,
-        pickedDateTimestamp: this.state.pickedDateTimestamp + milisecondsInYear,
-      });
-    };
+      setTimeout(() => {
+        this.setState({
+          ...this.state,
+          year: this.state.year - 1,
+        });
+        this.generateCalendar(this.state.pickedDateTimestamp - milisecondsInYear);
+      }, 50);
+    }
   }
 
   moveYearForward(event) {
     event.preventDefault();
     const milisecondsInYear = this.state.milisecondsInDay * 365;
-    this.generateCalendar(this.state.pickedDateTimestamp + milisecondsInYear);
-    this.setState({
-      ...this.state,
-      year: this.state.year + 1,
-      pickedDateTimestamp: this.state.pickedDateTimestamp + milisecondsInYear,
-    });
+    setTimeout(() => {
+      this.setState({
+        ...this.state,
+        year: this.state.year + 1,
+      });
+      this.generateCalendar(this.state.pickedDateTimestamp + milisecondsInYear);
+    }, 50);
   }
 
   constructDayObj(timestamp) {
@@ -75,7 +76,7 @@ class Calender extends Component {
     dayData.year = dateObj.getFullYear();
     dayData.day = dateObj.getDay();
     dayData.date = dateObj.getDate();
-    dayData.month = dateObj.getMonth();
+    dayData.month = dateObj.getMonth() + 1;
     dayData.seconds = dateObj.getSeconds();
     dayData.mins = dateObj.getMinutes();
     dayData.hours = dateObj.getHours();
@@ -85,7 +86,7 @@ class Calender extends Component {
 
   generateCalendar(timeStamp) {
     const dateInfo = this.constructDayObj(timeStamp);
-    dateInfo.monthInfo = monthDays[dateInfo.month];
+    dateInfo.monthInfo = this.state.monthObj[dateInfo.month];
     const milisecondsInDay = 86400000;
     const firstOfMonthTimeStamp = timeStamp - (milisecondsInDay*(dateInfo.date-1));
     const dateOfFirstOfMonth = new Date(firstOfMonthTimeStamp);
@@ -137,22 +138,24 @@ class Calender extends Component {
       newArray.push(daysDataCollector.splice(0,7));
     };
 
-    const idxOfPresentDay = []
+    const idxOfPresentDay = [];
     newArray.forEach((week, weekIdx) => {
       week.forEach((day, dayIdx )=> {
         if (day.state.includes('present-day')) {
-          idxOfPresentDay.push(weekIdx, dayIdx)
+          idxOfPresentDay.push(weekIdx, dayIdx);
         }
-      })
-    })
-
+      });
+    });
     setTimeout(() => {
       this.setState({
         dateInfo,
+        year: dateInfo.year,
+        month: dateInfo.month,
         daysDataCollector: newArray,
         indexOfSelectedDate: idxOfPresentDay,
         pickedDateTimestamp: dateInfo.timeStamp,
       });
+      this.props.getTimeStamp(this.state.pickedDateTimestamp);
     }, 50);
   };
 
@@ -180,76 +183,84 @@ class Calender extends Component {
         indexOfSelectedDate: dateIndices,
         daysDataCollector,
       }); 
-      this.props.getTimeStamp(this.state.pickedDateTimestamp)
-    }, 1000)
+      this.props.getTimeStamp(this.state.pickedDateTimestamp);
+    }, 50);
   }
 
   toggleMonths(event, direction) {
     event.preventDefault()
     let month = this.state.month;
+    let year = this.state.year;
     const { indexOfSelectedDate } = this.state;
     const selectedDate = this.state.daysDataCollector[indexOfSelectedDate[0]][indexOfSelectedDate[1]];
     const { date } = selectedDate;
 
     if (direction == 'forward') {
-      const daysInCurrentMonth = monthDays[month][0];
+      const daysInCurrentMonth = this.state.monthObj[month][0];
       const daysUptoNextMonth = date + (daysInCurrentMonth - date);
       const minisecondsToNextMonth = daysUptoNextMonth * this.state.milisecondsInDay;
       selectedDate.timeStamp  = selectedDate.timeStamp + minisecondsToNextMonth;
 
       if (month == 12) {
         month = 1
+        year++
       } else {
         month = month +1
       };
     }
     
     if (direction === 'backward') {
-      const daysInCurrentMonth = monthDays[month - 1][0];
+      const daysInCurrentMonth = this.state.monthObj[month][0];
       const daysUptoNextMonth = date + Math.abs(date - daysInCurrentMonth);
       const minisecondsToNextMonth = daysUptoNextMonth * this.state.milisecondsInDay;
       selectedDate.timeStamp = selectedDate.timeStamp - minisecondsToNextMonth;
 
       if (month == 1) {
         month = 12
+        year--
       } else {
         month = month - 1
       }
     }
-    this.setState({
-      month,
-      pickedDateTimestamp: selectedDate.timeStamp,
-    });
-    this.generateCalendar(selectedDate.timeStamp);
+    setTimeout(() => {
+      this.setState({
+        month,
+        year,
+        pickedDateTimestamp: selectedDate.timeStamp,
+      });
+      this.props.getTimeStamp(this.state.pickedDateTimestamp);
+      this.generateCalendar(selectedDate.timeStamp);
+    }, 50);
   };
 
   componentDidMount() {
-    const timeStamp = Date.now();
-    const date = new Date(timeStamp);
-    const hours = date.getHours() * 60 * 60 * 1000;
-    const minutes = date.getMinutes() * 60 * 1000;
-    const seconds = date.getSeconds() * 1000;
-    const milisecs = date.getMilliseconds();
-    const elapseTime = hours + minutes + seconds + milisecs;
-    const startOfDayTimeStamp = timeStamp - elapseTime;
-    this.generateCalendar(startOfDayTimeStamp)
+    let { timestamp } = this.props;
+    if (!timestamp) {
+      const timeStamp = Date.now();
+      const date = new Date(timeStamp);
+      const hours = date.getHours() * 60 * 60 * 1000;
+      const minutes = date.getMinutes() * 60 * 1000;
+      const seconds = date.getSeconds() * 1000;
+      const milisecs = date.getMilliseconds();
+      const elapseTime = hours + minutes + seconds + milisecs;
+      const startOfDayTimeStamp = timeStamp - elapseTime;
+      timestamp = startOfDayTimeStamp;
+    }
+    this.generateCalendar(timestamp);
   }
-
 
   render() {
     const {
       year,
       month,
+      monthObj,
+      weekObj,
       daysDataCollector,
-      pickedDateTimestamp
     } = this.state;
     let calendar;
-    let weekCount = 0;
-
     if (daysDataCollector) {
       calendar = daysDataCollector.map((week, index1) => {
         let weeks
-        weekCount++
         weeks = week.map((day, index2)=> {
           if (day.state.match(/disabled/)) {
             return (
@@ -278,7 +289,7 @@ class Calender extends Component {
         return <div key={index1}><div id='week'>{weeks}</div><br /></div>
       });
     };
-    const weekDays = Object.values(weekDayss).map((weekDay, idx) => {
+    const weekDays = Object.values(weekObj).map((weekDay, idx) => {
       return <div key={idx}><div>{weekDay}</div></div>;
     });
     
@@ -299,7 +310,7 @@ class Calender extends Component {
             <button onClick={(e) => this.toggleMonths(e, 'backward')}>
               &laquo;
             </button>
-            <span>{monthDays[month][1]}</span>
+            <span>{monthObj[month][1]}</span>
             <button onClick={(e) => this.toggleMonths(e, 'forward')}>
               &raquo;
             </button>

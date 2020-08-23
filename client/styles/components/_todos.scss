@@ -152,6 +152,8 @@
         }
       }
       #deadline {
+        display: flex;
+        justify-content: space-between;
         position: relative;
         height: 50px;
         width: 30%;
@@ -160,6 +162,28 @@
         padding: 3px;
         >div div {
           margin-top:3px;
+        }
+      }
+      #edit-deadline {
+        position: relative;
+        top: 13px;
+      }
+      #calendar {
+        position: relative;
+        top: -35px;
+        margin: 0px;
+        > div {
+          position: relative;
+          top: 5px;
+        }
+      }
+      #calendar > :nth-child(1) {
+        margin-top: 2px;
+        height: 26px;
+        #month-year {
+          position: relative;
+          margin-top: 0px;
+          top: -3px;
         }
       }
       #check-complete {
