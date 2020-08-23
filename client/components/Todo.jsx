@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import TodoForm from './TodoForm.jsx';
+import Calendar from './Calendar';
 import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 import { request } from '../helpers';
@@ -19,6 +20,8 @@ export class Todo extends Component {
     super()
     this.toggleCompleted = this.toggleCompleted.bind(this);
     this.formatDate = this.formatDate.bind(this);
+    this.toggleEditModeCalendar = this.toggleEditModeCalendar.bind(this);
+    this.setTimestamp = this.setTimestamp.bind(this);
     this.state = {
       link: {
         url: '',
@@ -29,7 +32,9 @@ export class Todo extends Component {
       },
       showTodoForm: false,
       editMode: false,
-      todoToEdit: {},
+      todoToEdit: {
+        openCalendarEditInMode: false,
+      },
     }
   }
   async componentWillMount() {
@@ -83,7 +88,9 @@ export class Todo extends Component {
     event && event.preventDefault();
     this.setState({
       editMode: !this.state.editMode,
-      todoToEdit: todo,
+      todoToEdit: {
+        ...todo,
+      }
     });
   }
 
@@ -138,11 +145,13 @@ export class Todo extends Component {
   async updateTodo(event) {
     const { id } = event.target;
     const todoId = parseInt(id.split('-')[2], 10);
+    const { todoToEdit } = this.state;
+    delete todoToEdit.openCalendarEditInMode;
     const updatedTodo =
     await request(`/todos/${todoId}`, 'PUT',
       this.state.todoToEdit);
-    this.toggleEditMode()
-    this.props.todoStore.updateTodo(updatedTodo)
+    this.toggleEditMode();
+    this.props.todoStore.updateTodo(updatedTodo);
   }
 
   async handleDeleteTodo(event) {
@@ -161,10 +170,30 @@ export class Todo extends Component {
     return `${date[0]} ${date[1]} ${date[2]}, ${date[3]} `
   }
 
+  setTimestamp(timestamp) {
+    this.setState({
+        todoToEdit: {
+          ...this.state.todoToEdit,
+          timestamp: timestamp,
+      },
+    });
+  };
+
+  toggleEditModeCalendar(event, todo) {
+    event.preventDefault();
+    this.setState({
+      ...this.state,
+      todoToEdit: {
+        ...todo,
+        openCalendarEditInMode: !todo.openCalendarEditInMode,
+      }
+    })
+  }
+
   render() {
     const todos = this.props.todoStore.todos;
     const { showTodoForm, todoToEdit, editMode } = this.state;
-    const $editingTodo = editMode ? 'editing' : '';
+    const editingTodo = editMode ? 'editing' : '';
     return (
       <div id="todos-container">
         <div id="todo-form_control">
@@ -220,7 +249,7 @@ export class Todo extends Component {
                     <div>
                       <div>
                       {editing ?
-                        <div id={$editingTodo}>
+                        <div id={editingTodo}>
                           <label className="item-label">Title: </label>
                           <input
                             value={todo.title}
@@ -244,7 +273,7 @@ export class Todo extends Component {
                           : <p>{todo.description}</p>
                         }
                       </div>
-                      <div id="links-div" className={$editingTodo}>
+                      <div id="links-div" className={editingTodo}>
                         <strong className="item-label">{todo.links && todo.links.length ? 'Links' : null}</strong>
                         <div>{todo.links && todo.links.length && todo.links.map((link, index)=> {
                           return (
@@ -270,7 +299,18 @@ export class Todo extends Component {
                             <div>{this.formatDate(todo.timestamp)}</div>
                           </div> : null
                         }
+                        <div>
+                          <div id="edit-deadline">
+                            {editing?
+                              <button onClick={event => this.toggleEditModeCalendar(event, todo)}>
+                                {todo.openCalendarEditInMode? 'Close Calendar' :
+                                  todo.timestamp ? 'Chagne deadline' : 'Add deadline' }
+                              </button> : null }
+                          </div>
+                        </div>
                       </div>
+
+                      {todo.openCalendarEditInMode? <Calendar timestamp={todo.timestamp} getTimeStamp={this.setTimestamp} /> : null}
                       <div id="check-complete">
                         <CompleteTodoCheckbox
                           todo={todo}
