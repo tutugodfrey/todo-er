@@ -5,15 +5,15 @@ import { observer, inject } from 'mobx-react';
 import { compose } from 'recompose';
 import { request } from '../helpers';
 
-const CompleteTodoCheckbox = ({ todo, toggleCompleted }) => (
+const CompleteTodoCheckbox = ({ todo, toggleCompleted }) => {
+  return (
   <input
     id={`todo-${todo.id}`}
     type="checkbox"
     checked={todo.completed}
-    value={todo.id}
-    onChange={toggleCompleted}
+    onChange={event => toggleCompleted(event, todo)}
   />
-)
+)}
 
 export class Todo extends Component {
   constructor() {
@@ -42,19 +42,19 @@ export class Todo extends Component {
     this.props.todoStore.setTodo(todos)
   }
 
-  async toggleCompleted(event) {
+  async toggleCompleted(event, todo) {
     this.setState({
       ...this.state,
       completeTodo: {
         completed: !this.state.completeTodo.completed,
-      }
-    })
+      },
+    });
     const updatedTodo = await request(
-      `/todos/${event.target.value}`,
+      `/todos/${todo.id}`,
       'PUT',
-      this.state.completeTodo
+      this.state.completeTodo,
     );
-    this.props.todoStore.updateTodo(updatedTodo)
+    this.props.todoStore.updateTodo(updatedTodo);
   }
 
   toggleTodoDisplay (event) {

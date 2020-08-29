@@ -22,14 +22,14 @@ let landing;
 let { WEB_URL } = process.env;
 WEB_URL = WEB_URL || 'http://localhost:3005'
 describe('Integration testing', () => {
-    before(() => {
+    before(async () => {
       base.visit(WEB_URL);
       base.driver.manage().window().maximize();
     });
 
-    after(() => {
-      base.driver.sleep(3000);
-      base.quit();
+    after(async () => {
+      await base.driver.sleep(1000);
+      await base.quit();
     });
 
     it('shoulld tests something', async () => {
@@ -39,7 +39,7 @@ describe('Integration testing', () => {
       expect(landing.story).to.eventually.equal('Task marker let you keep track of your goals for the day');
       expect(landing.header).to.eventually.equal('Don\'t leave any task uncompleted!');
       return expect(landing.submitBtnText).to.eventually.equal('Sign In');
-    }).timeout(5000);
+    }).timeout(10000);
 
     it('should attempt to signin', async () => {
       await signinPage.inLineSignin('username', 'Aa!12345');
@@ -62,14 +62,22 @@ describe('Integration testing', () => {
       expect(dashboardPage.contentHeader).to.equal('No Todos! Start adding your tasks');
       const createTask = await dashboard.createTask();
       expect(createTask.contentHeader).to.equal('Your Todos');
-      return expect(createTask.taskTitle).to.equal('todo1 title')
-    });
+      return expect(createTask.taskTitle).to.equal('todo1 title');
+    }).timeout(12000);
 
     it('should check todo expanded card', async () => {
       const taskContentCard = await dashboard.taskContentCard();
+      const deadline = taskContentCard.deadline.split(' ');
       expect(taskContentCard.taskTitle).to.equal('todo1 title');
-      expect(taskContentCard.taskDescription).to.equal('todo1 description');
-    });
+
+      // Test to create task picked Thurday 
+      expect(deadline[0]).to.equal('Thu');
+
+      // Test to create task pick a deadline one year ahead of current year.
+      expect(parseInt(deadline[3], 10)).to.equal(parseInt(new Date().toString().split(' ')[3], 10)+1)
+      expect(taskContentCard.completed).to.eql('true');
+      return expect(taskContentCard.taskDescription).to.equal('todo1 description');
+    }).timeout(12000);
 
     it('should test profile page', async () => {
       const profile = await profilePage.navToProfile();

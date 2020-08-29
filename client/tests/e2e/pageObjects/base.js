@@ -43,7 +43,7 @@ export default () => {
       return driver.wait(until.urlContains(urlSubstring), 5000);
     },
     find: (selector) => {
-      driver.wait(until.elementLocated(selector), 20000);
+      driver.wait(until.elementLocated(selector), 50000);
       return driver.findElement(selector);
     },
     write: (selector, text) => {
