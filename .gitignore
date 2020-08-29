@@ -7,3 +7,4 @@ public/*
 .elasticbeanstalk
 eb-tododer.zip
 terraform
+.vscode/

@@ -45,16 +45,27 @@ export default {
     linkDescriptionInput: By.css('#link-text'),
     linkUrlInput: By.css('#link-url'),
     addLinkBtn: By.css('#update-links'),
-    saveTaskBtn: By.css('div#todo-form_container div > button'),
+    saveTaskBtn: By.css('div#todo-form_container div.form-group > button'),
     toggleTaskFormBtn: By.css('#toggle-todoform_button'),
+    addDeadlineBtn: By.css('#todos-container form #add-deadline-btn button'),
+    moveYearBackwardBtn: By.css('#todos-container form #month-year > div:nth-child(1) button:nth-of-type(1)'),
+    moveYearForwardBtn: By.css('#todos-container form #month-year > div:nth-child(1) button:nth-of-type(2)'),
+    moveMonthBackwardBtn: By.css('#todos-container form #month-year > div:nth-child(2) button:nth-of-type(1)'),
+    moveMonthForwardBtn: By.css('#todos-container form #month-year > div:nth-child(2) button:nth-of-type(2)'),
+    daySelector: (week, day) => {
+      return By.css(`#days > div:nth-child(${week}) > div > :nth-child(${day}) button`);
+    },
   },
   tasksContainer: {
-    createdTodoTitle: By.css('div.todo-bar div[id*="todo-1-mini"] .todo-bar_title'),
+    createdTodoTitle: By.css('div.todo-bar div[id*="toggle-todo-1-mini"] .todo-bar_title'),
     toggleTaskDisplayBtn: By.css('div.todo-bar button[id*="todo-1"]'),
   },
   taskExpandedCard: {
     taskTitle: By.css('div#toggle-todo-1-main div h3'),
     taskDescription: By.css('div#toggle-todo-1-main div p'),
+    taskDeadline: (num) => {
+      return By.css(`#toggle-todo-${num}-main #deadline div div`)
+    },
     completedCheckbox: By.css('div#toggle-todo-1-main input[type="checkbox"]'),
     editLink: By.css('#edit-todo-1'),
     deleteLink: By.css('#delete-todo-1'),

@@ -19,6 +19,11 @@ Create simple  demo todo app with the data-modela npm package.
 #### Evironment variables
 Add environment variable after what is .env.example
 
+#### Running e2e test
+
+To run e2e test, you may need to reinstall the chromedriver to match your version of your chrome browser.
+My latest install version is `^85.0.0`. But I've changed the version in package.json to earlier version `80.0.1` because it is causing the build to fail on CircleCI.
+
 ## Building a docker images
 Environment variable require for building an image in 
 - PORT
