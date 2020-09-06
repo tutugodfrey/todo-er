@@ -45,7 +45,7 @@
     margin: 1px;
     > div {
       height: 24px;
-      #week {
+      .week {
         display:flex;
         flex-direction: row;
         position: relative;
@@ -84,7 +84,7 @@
     position: relative;
     top: -20px;
     padding: 3px 0px;
-    > div div {
+    > div {
       @include borderRadius;
       margin: 1px;
       padding: 1px;

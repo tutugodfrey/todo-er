@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class Calender extends Component {
+class Calendar extends Component {
   constructor() {
     super()
     this.state =  {
@@ -286,11 +286,11 @@ class Calender extends Component {
             </div>
           );
         });
-        return <div key={index1}><div id='week'>{weeks}</div><br /></div>
+        return <div key={index1}><div className='week'>{weeks}</div><br /></div>
       });
     };
     const weekDays = Object.values(weekObj).map((weekDay, idx) => {
-      return <div key={idx}><div>{weekDay}</div></div>;
+      return <div key={idx}>{weekDay}</div>;
     });
     
     return (
@@ -324,4 +324,7 @@ class Calender extends Component {
   }
 }
 
-export default Calender;
+export default Calendar;
+export {
+  Calendar
+}
