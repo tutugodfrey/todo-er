@@ -9,8 +9,12 @@ sudo apt install npm -y
 git clone https://github.com/tutugodfrey/todo-er
 cd todo-er
 
+JWT_SECRET=JWTSECRET; export JWT_SECRET
+PORT=APPPORT; export PORT
+IP=SERVERIP; export IP
+
 # fetch exportenvs.sh file from cloud storage.
-gsutil cp gs://todo-er/exportenvs.sh exportenvs.sh
+# gsutil cp gs://todo-er/exportenvs.sh exportenvs.sh
 
 # Setup environment variables
 ./setenv.sh
@@ -22,7 +26,9 @@ npm install
 npm run build
 
 # Move the frontend compoent to /var/www/html folder
-sudo cp public/* /var/www/html/public
+sudo cp public/{index.html,bundle.js} /var/www/html/
+sudo mkdir /var/www/html/public
+sudo cp public/*.{png,jpg} /var/www/html/public
 
 # start the backend api
 npm start
