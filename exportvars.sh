@@ -1,3 +1,3 @@
 export JWTSECRET=JWTSECRET
 export APPPORT=APPPORT
-export APIURL=APIURL
+# export IP=IP
