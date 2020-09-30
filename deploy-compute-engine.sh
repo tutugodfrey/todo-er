@@ -3,7 +3,7 @@
 project=$DEVSHELL_PROJECT_ID
 
 gcloud compute firewall-rules create default-allow-http-access \
-    --project todo-er
+    --project todo-er \
     --allow tcp:80,tcp:8081,tcp:8080 \
     --source-ranges 0.0.0.0/0 \
     --target-tags http-server \
