@@ -43,7 +43,6 @@ export class SignIn extends Component {
     }
     if (allFieldPass) {
       const createdUser =  await request('/users/signin', 'POST', this.state.user);
-
       if (createdUser.message) {
         const { message } = createdUser;
         let errorMessage = message;
@@ -51,7 +50,6 @@ export class SignIn extends Component {
           errorMessage =
             'Unsuccessful login! Please check your username and password'
         }
-        // console.log(errorMessage)
         this.setState({
           ...this.state,
           consoleMessage: errorMessage,
