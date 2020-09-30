@@ -73,7 +73,6 @@ describe('User Test', () => {
     it('should not create without password', () => {
       const user = {...testUsers.user1}
       delete user.password;
-      delete user.confirmPassword;
       delete user.wrongPassword
       postRequest(signUpRoute, user)
       .then(res => {
@@ -82,6 +81,31 @@ describe('User Test', () => {
           .to.equal('password is required to sign up');
       });
     });
+
+    it('should not create without confrmPassword', () => {
+      const user = {...testUsers.user1}
+      delete user.confirmPassword;
+      delete user.wrongPassword
+      postRequest(signUpRoute, user)
+      .then(res => {
+        expect(res.status).to.equal(400)
+        expect(res.body).to.have.property('message')
+          .to.equal('confirmPassword is required to sign up');
+      });
+    });
+
+    it('should not create if password and confirmPassword does not match', () => {
+      const user = {...testUsers.user1}
+      user.confirmPassword = `${user.assword}123`;
+      delete user.wrongPassword
+      postRequest(signUpRoute, user)
+      .then(res => {
+        expect(res.status).to.equal(401)
+        expect(res.body).to.have.property('message')
+          .to.equal('Passwords does not match');
+      });
+    });
+
     it('should not create a user without name', () => {
       const user = { ...testUsers.user1 }
       delete user.name;

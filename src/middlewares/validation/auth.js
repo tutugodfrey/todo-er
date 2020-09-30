@@ -1,7 +1,7 @@
 export default {
   signup: (req, res, next) => {
     let count = 0
-    const fields = ['password', 'name', 'email', 'username'];
+    const fields = ['password', 'confirmPassword', 'name', 'email', 'username'];
     fields.forEach(field => {
       if (!req.body[field]) 
       return res.status(400).json({
@@ -12,6 +12,8 @@ export default {
 
     // check that all fields are validated 
     if (fields.length === count) {
+      if (req.body['password'] !== req.body['confirmPassword'])
+        return res.status(401).json({ message: 'Passwords does not match' })
       return next();
     }
   },
