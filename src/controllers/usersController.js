@@ -61,6 +61,7 @@ class UsersController  {
             token
           })
         }
+        return res.status(404).json({ message: 'user not found' });
       })
       .catch(err => {
         if(err.message && err.message === 'user not found') {

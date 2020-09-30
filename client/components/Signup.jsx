@@ -42,15 +42,23 @@ import { request, closeConsole } from '../helpers';
 
     async handleSubmit(event) {
       event.preventDefault();
+      const { user } = this.state
       let allFieldPass = true;
-      for(let field in this.state.user) {
-        if (!this.state.user[field]) {
-          console.log(field, this.state.user[field], 'missing value')
+      for(let field in user) {
+        if (!user[field]) {
+          console.log(field, user[field], 'missing value')
           allFieldPass = false;
         }
       }
+
+      if (user.password !== user.confirmPassword) {
+        allFieldPass = false;
+        this.setState({
+          consoleMessage: 'Please enter matching passwords'
+        });
+      }
       if (allFieldPass) {
-        const createdUser =  await request('/users/signup', 'POST', this.state.user);
+        const createdUser =  await request('/users/signup', 'POST', user);
         if (createdUser.message) {
           let errorMessage = createdUser.message;
           if (errorMessage.indexOf('unique') >= 0) {
