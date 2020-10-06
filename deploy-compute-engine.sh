@@ -23,3 +23,6 @@ gcloud compute instances create todoapp-vm \
 VM_IP=$(gcloud compute instances describe todoapp-vm   --format='get(networkInterfaces[0].accessConfigs[0].natIP)' --zone us-central1-a)
 echo "See the vm External IP address below"
 echo $VM_IP
+
+# Replace the value SERVERIP for future deployment
+sed -i -e s/$ipaddress/SERVERIP/ ./startup.sh
