@@ -37,7 +37,7 @@ export class Todo extends Component {
       },
     }
   }
-  async componentWillMount() {
+  async componentDidMount() {
     const todos = await request('/todos', 'GET');
     this.props.todoStore.setTodo(todos)
   }
@@ -189,6 +189,7 @@ export class Todo extends Component {
       }
     })
   }
+
 
   render() {
     const todos = this.props.todoStore.todos;
