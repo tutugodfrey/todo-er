@@ -5,6 +5,7 @@ import Signup from './components/Signup.jsx';
 import Signin from './components/Signin.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import Profile from './components/Profile.jsx';
+import NotFoundPage from './components/NotFoundPage.jsx';
 
 import { ROUTES } from './constants'
 
@@ -19,6 +20,7 @@ const Routes = (props) => {
           <Route path={ROUTES.SIGN_IN} exact component={Signin} />
           <Route path={ROUTES.DASHBOARD} exact component={Dashboard} />
           <Route path={ROUTES.PROFILE} exact component={Profile} />
+          <Route><NotFoundPage /> </Route>
         </Switch>
       </BrowserRouter>
     </div>
