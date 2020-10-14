@@ -1,0 +1,7 @@
+{
+  "servers": [
+    "http://HOST:8081/api",
+    "http://HOST:8082/api",
+    "http://HOST:8083/api"
+  ]
+}
