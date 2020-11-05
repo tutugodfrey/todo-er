@@ -66,7 +66,7 @@ describe('Profile component test', () => {
       expect(childrenInfo.at(1).props().id).toBe('profile-image_div');
       expect(childrenInfo.at(1).name()).toBe('div');
       expect(childrenInfo.at(1).children().at(0).type()).toBe('img');
-      expect(childrenInfo.at(1).children().at(0).props().src).toBe('public/default-profile.png');
+      expect(childrenInfo.at(1).children().at(0).props().src).toBe('public/profilePhotos/default-profile.png');
       expect(childrenInfo.at(1).children().at(3).name()).toBe('button');
       expect(childrenInfo.at(1).children().at(3).props().children).toBe('Change');
       wrapper.find('#change-profile-photo').simulate('click');
@@ -118,7 +118,7 @@ describe('Profile component test', () => {
       expect(children.at(0).props().className).toBe('profile-image_div');
       expect(children.at(0).name()).toBe('div');
       expect(children.at(0).children().type()).toBe('img');
-      expect(children.at(0).children().props().src).toBe('public/default-profile.png');
+      expect(children.at(0).children().props().src).toBe('public/profilePhotos/default-profile.png');
     });
 
     test('should render name for editing', () => {

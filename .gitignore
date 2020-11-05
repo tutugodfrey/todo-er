@@ -1,10 +1,13 @@
 node_modules
 .env
 public/*
-!public/default-profile.png
+!public/profilePhotos/default-profile.png
 !public/backgroud-image.jpg
+!public/uploads/
 .ebextensions
 .elasticbeanstalk
 eb-tododer.zip
 terraform
 .vscode/
+public/.DS_Store
+

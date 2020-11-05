@@ -56,7 +56,7 @@ export default {
   changeProfilePhoto: async () => {
     const changeProfilePhotoBtn = await base.find(profile.changeProfilePhotoBtn);
     await changeProfilePhotoBtn.click();
-    await base.find(profile.fileInputField).sendKeys('/Users/godfreytutu/Desktop/projects/todo-er/public/profilePhoto-1.jpg');
+    await base.find(profile.fileInputField).sendKeys('/Users/godfreytutu/Desktop/projects/todo-er/public/uploads/profilePhoto-1.jpg');
     await base.find(profile.uploadBtn).click();
     return null;
   },

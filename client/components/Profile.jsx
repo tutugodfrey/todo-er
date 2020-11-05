@@ -133,7 +133,7 @@ export class Profile extends React.Component {
           {this.state.editMode && (
             <div id="edit-profile">
               <div className="profile-image_div">
-                <img src={imgUrl || "public/default-profile.png"}/>
+                <img src={imgUrl || "public/profilePhotos/default-profile.png"}/>
               </div>
               <div className="input-group">
                 <label>Name:</label>
@@ -178,7 +178,7 @@ export class Profile extends React.Component {
                 </span>}
                 <Fragment>
                   <img
-                    src={ this.state.profileImage || imgUrl || 'public/default-profile.png'}
+                    src={ this.state.profileImage || imgUrl || 'public/profilePhotos/default-profile.png'}
                   />
                   <br />
                 </Fragment>
@@ -204,6 +204,7 @@ export class Profile extends React.Component {
                 >
                   {changeProfileImage? "Cancle" : "Change"}
                 </button>
+                <img src={user.imgUser || 'public/profilePhotos/default-profile.png'} />
               </div>
               <div className="profile-details">
                 <div><strong>Email:</strong></div>
