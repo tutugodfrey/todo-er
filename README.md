@@ -22,7 +22,7 @@ Add environment variable after what is .env.example
 #### Running e2e test
 
 To run e2e test, you may need to reinstall the chromedriver to match your version of your chrome browser.
-My latest install version is `^85.0.0`. But I've changed the version in package.json to earlier version `80.0.1` because it is causing the build to fail on CircleCI.
+My latest install version is `^86.0.0`. But I've changed the version in package.json to earlier version `80.0.1` because it is causing the build to fail on CircleCI.
 
 ## Building a docker images
 Environment variable require for building an image in 
@@ -39,7 +39,8 @@ Note the API_URL should be the base url that frontend app will run on. if your a
 
 ### Examples
 #### using build-arg
-- $ docker build --build-arg JWT_SECRET=somethingfishing --build-arg port=3005  -t todoapp:latest 
+- `$ docker build --build-arg JWT_SECRET=somethingfishing --build-arg port=3005  -t todoapp:latest .`
+
 - API_URL=http://localhost:3005/api  --- change the port to your desired port and make the API_URL available in our .env file
 
 #### Using Jenkin build
