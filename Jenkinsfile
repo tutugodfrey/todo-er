@@ -4,6 +4,7 @@ pipeline {
     string(name: 'Container', defaultValue: 'todoapp', description: 'Container name')
     string(name: 'Image', defaultValue: 'todoapp:latest', description: 'Image name and tag')
     string(name: 'Repo', defaultValue: 'tutug', description: 'Reporitory url')
+    string(name: 'FrontendImage', defaultValue: 'todoapp-fd:latest', 'Image name of frontend app')
   }
   stages {  
     stage('Cloning Git') {
@@ -56,5 +57,22 @@ pipeline {
         echo "Successfully build ${env.BUILD_ID} on ${env.JENKINS_URL}"
       }
     } 
+  }
+
+  stage('Build frontend image') {
+    steps {
+      echo env.JWT_SECRET
+      HOST=$(minikube ip)
+      PORT
+      sh """docker build \
+        --build-arg API_URL=http://${HOST}:${PORT}/api \
+        -t ${params.Repo}/${params.FrontendImage} ."""
+    }
+  }
+
+  stage('Push frontend image to registry')  {
+    steps {
+      sh "docker push ${params.Repo}/${params.FrontendImage}"
+    }
   }
 }
