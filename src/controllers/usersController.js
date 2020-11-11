@@ -74,13 +74,14 @@ class UsersController  {
   static updateUser(req, res) {
     let { userId } = req.body;
     const update = req.body
+    delete update.userId;
     return users
       .update({
         where: {
           id: userId
         }
       },
-      update
+      update,
       )
       .then(user => {
         const user_ = { ...user }

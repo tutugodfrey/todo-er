@@ -22,7 +22,8 @@
     "build": "npm run webpack -- --mode production",
     "coverage": "nyc npm run test && nyc report --reporter=lcov",
     "start:client": "webpack-dev-server --mode development --hot --open",
-    "storybook": "start-storybook"
+    "storybook": "start-storybook",
+    "create:table": "node -r esm src/model/tables.js"
   },
   "keywords": [
     "Node",
@@ -43,7 +44,7 @@
     "chai-http": "^4.3.0",
     "chromedriver": "80.0.1",
     "cors": "^2.8.5",
-    "data-modela": "0.0.3",
+    "data-modela": "0.0.9",
     "dotenv-safe": "^6.1.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
