@@ -47,6 +47,7 @@ class TodoController {
     let { id } = req.params;
     id = parseInt(id, 10);
     const updates = req.body;
+    delete updates.userId;
     return todos
       .update({
         where: {
@@ -77,7 +78,9 @@ class TodoController {
             userId
           }
         })
-        .then(result => res.status(200).json(result))
+        .then(result => {
+          return res.status(200).json(result)
+        })
       })
       .catch(err => {
         if (err.message && err.message === 'todo not found, not action taken')

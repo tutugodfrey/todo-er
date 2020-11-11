@@ -78,14 +78,16 @@ describe('<Calendar /> component test', () => {
 
     it('should render the month correctly', () => {
       let wrapper = wrapper = shallow(<Calendar timestamp={timestamp} />);
-      const monYearSection = wrapper.find('#month-year');
-      expect(monYearSection.name()).to.equal('div');
-      expect(monYearSection.childAt(1).children().at(0).type()).to.equal('button');
-      expect(monYearSection.childAt(1).children().at(1).type()).to.equal('span');
-      expect(monYearSection.childAt(1).children().at(2).type()).to.equal('button');
+      setTimeout(() => {
+        const monYearSection = wrapper.find('#month-year');
+        expect(monYearSection.name()).to.equal('div');
+        expect(monYearSection.childAt(1).children().at(0).type()).to.equal('button');
+        expect(monYearSection.childAt(1).children().at(1).type()).to.equal('span');
+        expect(monYearSection.childAt(1).children().at(2).type()).to.equal('button');
 
-      // Month should match the current month
-      expect(monYearSection.childAt(1).children().at(1).text()).to.equal(dateObj[1]);
+        // Month should match the current month
+        expect(monYearSection.childAt(1).children().at(1).text()).to.equal(dateObj[1]);
+      }, 300)
     });
   });
 });
