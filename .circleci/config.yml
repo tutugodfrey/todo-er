@@ -32,6 +32,10 @@ jobs:
             sudo npm link data-modela;
           # - npm install git+https://github.com/tutugodfrey/modela.git#0.0.9
       # - run:
+      #     name: install dependencies
+      #     command:
+      #       npm install git+https://github.com/tutugodfrey/modela.git
+      # - run:
       #     name: install java
       #     command:
       #       sudo apt update && sudo apt-get upgrade && sudo apt install apt-get install default-jdk;
