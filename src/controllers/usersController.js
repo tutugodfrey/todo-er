@@ -30,7 +30,7 @@ class UsersController  {
           imgUrl,
         });
       })
-      .catch(err =>  res.status(500).send(err))
+      .catch(err => res.status(500).send(err));
   };
 
   static signIn(req, res) {
@@ -73,15 +73,16 @@ class UsersController  {
 
   static updateUser(req, res) {
     let { userId } = req.body;
-    const update = req.body
+    const update = { ...req.body };
     delete update.userId;
     return users
-      .update({
-        where: {
-          id: userId
-        }
-      },
-      update,
+      .update(
+        update,
+        {
+          where: {
+            id: userId
+          }
+        },
       )
       .then(user => {
         const user_ = { ...user }
@@ -101,7 +102,8 @@ class UsersController  {
         return users
           .findAll()
           .then(allUsers => {
-            const result = allUsers.map(user => {
+            const result = allUsers.map(user_ => {
+              const user = { ...user_ };
               delete user.password
               return user
             })
@@ -144,13 +146,14 @@ class UsersController  {
   static uploadPhoto(req, res) {
     const { profilePhoto, userId } = req.body;
     return users
-    .update({
+    .update(
+      {
+        imgUrl: profilePhoto || ''
+      },
+      {
       where: {
         id: userId
       }
-    },
-    {
-      imgUrl: profilePhoto || ''
     }
     )
     .then(user => {
