@@ -44,7 +44,6 @@
     "chai-http": "^4.3.0",
     "chromedriver": "80.0.1",
     "cors": "^2.8.5",
-    "data-modela": "0.0.9",
     "dotenv-safe": "^6.1.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
