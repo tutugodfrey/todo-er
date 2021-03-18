@@ -17,15 +17,9 @@ jobs:
           name: install dependencies
           command:
             npm install
-      - run:
-          name: where am i
-          command:
-            pwd;
-            cd /; 
-           # sudo apt install git -y;
 
       - run:
-          name: install latest data-modela from repository
+          name: clone and use latest data-modela from repository
           command:
             pwd;
             cd /;
