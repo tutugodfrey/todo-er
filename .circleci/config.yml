@@ -19,7 +19,7 @@ jobs:
             npm install
 
       - run:
-          name: install latest data-modela from repository
+          name: clone and use latest data-modela from repository
           command:
             pwd;
             cd /;
