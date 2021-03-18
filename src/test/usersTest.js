@@ -21,8 +21,23 @@ const {
 } = requestHelper;
 
 describe('User Test', () => {
-  before(() => users.clear());
-  before(() => todos.clear());
+  before(() => {
+    try {
+     users.clear();
+    } catch(err) {
+      console.log(err)
+    }
+    return
+  });
+  before(() => {
+    try {
+     todos.clear();
+    } catch(err) {
+      console.log(err)
+    }
+    return
+  });
+
 
   describe('Create New User', () => {
     it('should not create without password', () => {

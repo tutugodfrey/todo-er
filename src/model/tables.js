@@ -1,4 +1,4 @@
-// import { connect } from 'data-modela'; // will uncomment when data-modela is updated with connect function
+import { connect } from 'data-modela'; // will uncomment when data-modela is updated with connect function
 import dotenv from 'dotenv-safe';
 dotenv.config();
 
@@ -23,8 +23,8 @@ function createTable(db_client) {
     title VARCHAR(70) NOT NULL UNIQUE,
     description VARCHAR(700),
     "userId" INT NOT NULL,
-    deadline timestamp,
-    links VARCHAR(700),
+    deadline timestamptz,
+    links VARCHAR(700) [],
     completed BOOLEAN NOT NULL,
     "createdAt" date NOT NULL,
     "updatedAt" date NOT NULL

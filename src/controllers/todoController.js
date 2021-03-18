@@ -49,11 +49,14 @@ class TodoController {
     const updates = req.body;
     delete updates.userId;
     return todos
-      .update({
-        where: {
-          id,
-        }
-      }, updates)
+      .update(
+        updates,
+        {
+          where: {
+            id,
+          }
+        },
+      )
       .then(todo => {
         return res.status(200).json(todo)
       })

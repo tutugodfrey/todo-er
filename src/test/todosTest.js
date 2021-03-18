@@ -18,8 +18,20 @@ const {
   putRequest
 } = requestHelper;
 describe('Todos Test', () => {
-  before(() => users.clear());
-  before(() => todos.clear());
+  before(() => {
+    try {
+      users.clear();
+    } catch(err) {
+      console.log(err)
+    }
+  });
+  before(() => {
+    try {
+      todos.clear();
+    } catch(err) {
+      console.log(err)
+    }
+  });
 
   before(() => {
     const user2_ = testUsers.user2;
