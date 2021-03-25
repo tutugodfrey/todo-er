@@ -39,7 +39,9 @@ export class Todo extends Component {
   }
   async componentDidMount() {
     const todos = await request('/todos', 'GET');
-    this.props.todoStore.setTodo(todos)
+    if (!todos.message) {
+      this.props.todoStore.setTodo(todos)
+    }
   }
 
   async toggleCompleted(event, todo) {
@@ -174,7 +176,7 @@ export class Todo extends Component {
     this.setState({
         todoToEdit: {
           ...this.state.todoToEdit,
-          timestamp: timestamp,
+          deadline: timestamp,
       },
     });
   };
@@ -295,9 +297,9 @@ export class Todo extends Component {
 
                       <div id="deadline">
                         {
-                        todo.timestamp? <div>
+                        todo.deadline? <div>
                             <strong>Target date</strong>
-                            <div>{this.formatDate(todo.timestamp)}</div>
+                            <div>{this.formatDate(todo.deadline)}</div>
                           </div> : null
                         }
                         <div>
@@ -305,13 +307,13 @@ export class Todo extends Component {
                             {editing?
                               <button onClick={event => this.toggleEditModeCalendar(event, todo)}>
                                 {todo.openCalendarEditInMode? 'Close Calendar' :
-                                  todo.timestamp ? 'Chagne deadline' : 'Add deadline' }
+                                  todo.deadline ? 'Chagne deadline' : 'Add deadline' }
                               </button> : null }
                           </div>
                         </div>
                       </div>
 
-                      {todo.openCalendarEditInMode? <Calendar timestamp={todo.timestamp} getTimeStamp={this.setTimestamp} /> : null}
+                      {todo.openCalendarEditInMode? <Calendar timestamp={todo.deadline} getTimeStamp={this.setTimestamp} /> : null}
                       <div id="check-complete">
                         <CompleteTodoCheckbox
                           todo={todo}

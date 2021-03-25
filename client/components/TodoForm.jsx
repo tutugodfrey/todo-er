@@ -24,7 +24,7 @@ class TodoForm extends Component {
         title: '',
         description: '',
         links: [],
-        timestamp: 0,
+        deadline: 0,
       },
     }
   };
@@ -80,7 +80,6 @@ class TodoForm extends Component {
   async onSaveTodo(event) {
     const todo = await request('/todos', 'POST', this.state.todoObj);
     if (todo.message) {
-      console.log(todo.message);
       const { message } = todo;
       let errorMessage = message;
       if (message === 'duplicate entry for unique key title') {
@@ -107,7 +106,7 @@ class TodoForm extends Component {
     this.setState({
         todoObj: {
           ...this.state.todoObj,
-          timestamp: timestamp,
+          deadline: timestamp,
       },
     });
   };
