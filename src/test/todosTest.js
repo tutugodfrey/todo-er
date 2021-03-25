@@ -116,7 +116,7 @@ describe('Todos Test', () => {
         });
     });
 
-    it('should not todos created by other users', () => {
+    it('should not return todos created by other users', () => {
       return getRequest(baseUrl, user1.token)
         .then(res => {
           expect(res.status).to.equal(200);
@@ -155,6 +155,7 @@ describe('Todos Test', () => {
           expect(res.body).to.have.property('userId').to.equal(user2.id);
           expect(res.body).to.have.property('completed').to.equal(true);
         })
+        .catch(err => console.log(err))
     })
   });
 

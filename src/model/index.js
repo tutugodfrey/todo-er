@@ -26,7 +26,7 @@ const users = new DataModela('users', {
   },
   isAdmin: {
     dataType: 'boolean',
-    default: false,
+    defaultValue: false,
   },
   password: {
     required: true,
@@ -34,10 +34,12 @@ const users = new DataModela('users', {
     charLength: 100,
   },
   createdAt: {
-    dataType: 'timestamp'
+    dataType: 'timestamp',
+    required: true,
   },
   updatedAt: {
-    dataType: 'timestamp'
+    dataType: 'timestamp',
+    required: true,
   },
 });
 
@@ -57,6 +59,9 @@ const todos = new DataModela('todos', {
     dataType: 'number',
     required: true,
   },
+  deadline: {
+    dataType: 'timestamp',
+  },
   completed: {
     dataType: 'boolean',
   },
@@ -75,9 +80,17 @@ const todos = new DataModela('todos', {
     required: true,
   },
 });
+const dbEnvMap = {
+  prod: 'DATABASE_URL',
+  dev: 'DEV_DATABASE_URL',
+  test: 'TEST_DATABASE_URL'
+}
+
+let { NODE_ENV } = process.env;
+NODE_ENV = NODE_ENV || 'prod';
 
 if (parseInt(process.env.USE_DB)) {
-  const { DATABASE_URL } = process.env;
+  const DATABASE_URL = process.env[dbEnvMap[NODE_ENV]]
   const connection = connect(DATABASE_URL, [ users, todos ]);
 }
 

@@ -4,7 +4,9 @@ class TodoController {
   static createTodo(req, res) {
     const todo = req.body;
     todo.completed = false;
-    // check that the user with userId exist
+    if (todo.deadline !== undefined && todo.deadline === 0) {
+      delete todo.deadline;
+    }
     return users
       .findById(req.body.userId)
       .then(user => {
@@ -15,7 +17,7 @@ class TodoController {
           return res.status(201).json(todo);
         })
       })
-      .catch(err => res.status(500).json(err))
+      .catch(err => res.status(500).json(err.message))
   }
 
   static getTodo(req, res) {
@@ -26,7 +28,9 @@ class TodoController {
       .then(todo => {
         return res.status(200).json(todo);
       })
-      .catch(err => res.status(500).json(err))
+      .catch(err => {
+        return res.status(500).json(err)
+      })
   }
 
   static getTodos(req, res) {
@@ -37,10 +41,8 @@ class TodoController {
           userId,
         }
       })
-      .then(todo => {
-        return res.status(200).json(todo);
-      })
-      .catch(err => res.status(500).json(err))
+      .then(todo => res.status(200).json(todo))
+      .catch(err => res.status(500).json(err));
   }
 
   static  updateTodo(req, res) {
@@ -48,18 +50,33 @@ class TodoController {
     id = parseInt(id, 10);
     const updates = req.body;
     delete updates.userId;
-    return todos
-      .update(
-        updates,
-        {
-          where: {
-            id,
-          }
-        },
-      )
+    return todos.findById(id)
       .then(todo => {
-        return res.status(200).json(todo)
+        const update = {
+          title: updates.title || todo.title,
+          description: updates.description || todo.description,
+          completed: updates.completed || todo.completed,
+          links: updates.links || todo.links,
+          deadline: updates.deadline || todo.deadline,
+        }
+        // remove fields with null
+        const fields = Object.keys(update);
+        fields.forEach(field => {
+          if (update[field] === null) {
+            delete update[field]
+          }
+        })
+        return todos
+        .update(
+          update,
+          {
+            where: {
+              id,
+            }
+          },
+        )
       })
+      .then(todo => res.status(200).json(todo))
       .catch(err => {
         if (err.message && err.message === 'todo not found')
           return res.status(404).json(err);
