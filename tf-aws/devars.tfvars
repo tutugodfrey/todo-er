@@ -32,4 +32,3 @@ db_server_hostname = "db.todo.com"
 db_name = "DB_NAME"
 db_user_name = "DB_USERNAME"
 db_user_pass = "DB_PASSWD"
-

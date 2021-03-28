@@ -16,3 +16,4 @@ tf-aws/terraform.tfstate.backup
 tf-aws/terraform.tfstate
 tf-aws/.terraform.lock.hcl
 tf-aws/.terraform
+tf-aws/envfile
