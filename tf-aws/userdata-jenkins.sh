@@ -1,0 +1,42 @@
+#! /bin/bash
+
+yum install java-1.8.0 -y;
+wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat/jenkins.repo;
+rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key;
+yum install jenkins -y;
+yum install postgresql -y # needed to connect to db during test
+systemctl enable jenkins;
+systemctl start jenkins;
+
+JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
+JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
+
+
+APP_SERVER_1_IP=${APP_SERVER_1_IP}
+APP_SERVER_2_IP=${APP_SERVER_2_IP}
+LB_SERVER_IP=${LB_SERVER_IP}
+STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
+JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+DB_SERVER_IP=${DB_SERVER_IP}
+APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME}
+APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME}
+LB_SERVER_HOSTNAME=${LB_SERVER_HOSTNAME}
+JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
+STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
+DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
+
+if [ $JENKINS_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $JENKINS_SERVER_HOSTNAME;
+fi;
+
+cat >> /etc/hosts <<EOF
+$APP_SERVER_1_IP            $APP_SERVER_1_HOSTNAME app1
+$APP_SERVER_2_IP            $APP_SERVER_2_HOSTNAME app2
+$LB_SERVER_IP               $LB_SERVER_HOSTNAME lb
+$JENKINS_SERVER_IP          $JENKINS_SERVER_HOSTNAME jenkins
+$STORAGE_SERVER_IP          $STORAGE_SERVER_HOSTNAME store
+$JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump
+$DB_SERVER_IP               $DB_SERVER_HOSTNAME db
+EOF

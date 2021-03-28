@@ -19,7 +19,7 @@ jobs:
             npm install
 
       - run:
-          name: install latest data-modela from repository
+          name: clone and use latest data-modela from repository
           command:
             pwd;
             cd /;
@@ -31,6 +31,10 @@ jobs:
             cd ~/app;
             sudo npm link data-modela;
           # - npm install git+https://github.com/tutugodfrey/modela.git#0.0.9
+      # - run:
+      #     name: install dependencies
+      #     command:
+      #       npm install git+https://github.com/tutugodfrey/modela.git
       # - run:
       #     name: install java
       #     command:
