@@ -220,6 +220,8 @@ data "template_file" "user-data-app-server-1" {
     SERVER_IP = var.app_server_1_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     DB_NAME = var.db_name
@@ -266,6 +268,8 @@ data "template_file" "user-data-app-server-2" {
     SERVER_IP = var.app_server_2_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     DB_NAME = var.db_name
@@ -316,13 +320,17 @@ resource "aws_network_interface" "todo-app-lb-server-eni" {
 }
 
 data "template_file" "user-data-lb-server" {
-  template = file("lb-userdata.sh")
+  template = file("userdata-lb.sh")
   vars = {
     NEW_HOSTNAME = var.lb_server_hostname
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
     APP_SERVER_2_IP = var.app_server_2_private_ip
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
+    STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
+    STORAGE_SERVER_IP = var.storage_server_private_ip
   }
 }
 
@@ -369,10 +377,11 @@ data "template_file" "jenkins-server-template" {
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
-    LB_SERVER_IP = var.lb_server_hostname
-    LB_SERVER_HOSTNAME = var.lb_server_private_ip
+    LB_SERVER_IP = var.lb_server_private_ip
+    LB_SERVER_HOSTNAME =var.lb_server_hostname
     JUMP_SERVER_IP = var.jump_server_private_ip
     JUMP_SERVER_HOSTNAME = var.jump_server_hostname
+    NAGIOS_ADMIN_PASSWD = var.nagios_admin_passwd
   }
 }
 
@@ -487,6 +496,8 @@ data "template_file" "db-server-template-file" {
     VPC_CIDR_BLOCK = var.vpc_cidr_block
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_NAME = var.db_name
     DB_USER_PASS = var.db_user_pass
     DB_USER_NAME = var.db_user_name
@@ -605,6 +616,7 @@ data "template_file" "jump-server-template-file" {
     JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
+    ANSIBLE_PASSWD = var.ansible_passwd
   }
 }
 

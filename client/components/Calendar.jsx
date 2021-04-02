@@ -16,7 +16,7 @@ class Calendar extends Component {
         1: [31, 'Jan'],
         2: [28, 'Feb'],
         3: [31, 'Mar',],
-        4: [30, 'April'],
+        4: [30, 'Apr'],
         5: [31, 'May'],
         6: [30, 'Jun'],
         7: [31, 'Jul'],

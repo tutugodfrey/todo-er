@@ -31,7 +31,7 @@ $APP_SERVER_2_IP            $APP_SERVER_2_HOSTNAME app2
 $LB_SERVER_IP               $LB_SERVER_HOSTNAME lb
 $JENKINS_SERVER_IP          $JENKINS_SERVER_HOSTNAME jenkins
 $STORAGE_SERVER_IP          $STORAGE_SERVER_HOSTNAME store
-$JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump
+$JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
 $DB_SERVER_IP               $DB_SERVER_HOSTNAME db
 EOF
 
@@ -74,3 +74,17 @@ echo "/modela $APP_SERVER_1_HOSTNAME $APP_SERVER_2_HOSTNAME $LB_SERVER_HOSTNAME 
 
 mount -a
 exportfs -av
+
+cd /;
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
+
+#ANSIBLE_CONFIG
+
+# Wait for puppet server to apply copyssh.pp
+#PUPPET_WAIT_2
