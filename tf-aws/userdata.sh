@@ -9,6 +9,8 @@ fi
 NEW_HOSTNAME=${NEW_HOSTNAME}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
 DB_SERVER_IP=${DB_SERVER_IP}
 DB_NAME=${DB_NAME}
@@ -23,6 +25,7 @@ fi;
 cat >> /etc/hosts <<EOF
 $STORAGE_SERVER_IP       $STORAGE_SERVER_HOSTNAME store
 $DB_SERVER_IP            $DB_SERVER_HOSTNAME db-server
+$JUMP_SERVER_IP          $JUMP_SERVER_HOSTNAME jump puppet
 EOF
 
 yum install -y gcc-c++ make;
@@ -96,3 +99,16 @@ systemctl enable todoapp.service
 systemctl start todoapp.service
 systemctl enable todoapp-watcher.{path,service}
 systemctl start todoapp-watcher.{path,service}
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
+
+# Apply ansible install and configuration
+#ANSIBLE_CONFIG
+
+# Wait for puppet server to apply copyssh.pp
+#PUPPET_WAIT_2

@@ -9,11 +9,16 @@ DB_USER_NAME=${DB_USER_NAME}
 DB_USER_PASS=${DB_USER_PASS}
 DB_PORT=${DB_PORT}
 VPC_CIDR_BLOCK=${VPC_CIDR_BLOCK}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 
 if [ DB_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $DB_SERVER_HOSTNAME
 fi;
 
+cat >> /etc/hosts <<EOF
+$JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
+EOF
 # Install postgresql server
 yum install postgresql-server postgresql-contrib -y;
 
@@ -43,3 +48,15 @@ sudo -i -u postgres psql < setup.sql;
 
 sed -i "/# \x22local\x22 is for Unix domain socket connections only/a local    todoapp        todoapp           md5" /var/lib/pgsql/data/pg_hba.conf;
 sed -i "/# IPv4 local connections:/a host    todoapp        todoapp         10.0.0.0/16           md5" /var/lib/pgsql/data/pg_hba.conf;
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
+
+#ANSIBLE_CONFIG
+
+# Wait for puppet server to apply copyssh.pp
+#PUPPET_WAIT_2

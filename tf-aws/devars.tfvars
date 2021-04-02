@@ -29,6 +29,10 @@ lb_server_hostname = "lb-server.todo.com"
 db_server_hostname = "db.todo.com"
 
 # Variable values should be replace before deployment
+# when ./deploy script is executed and the process will
+# reverse after terraform has finish deploying
 db_name = "DB_NAME"
 db_user_name = "DB_USERNAME"
 db_user_pass = "DB_PASSWD"
+ansible_passwd = "ANSIBLE_PASSWD"
+nagios_admin_passwd = "NAGIOS_ADMIN_PASSWD"

@@ -33,3 +33,6 @@ variable "db_user_pass" {}
 variable "db_port" {
   default = 5432
 }
+
+variable "ansible_passwd" {}
+variable "nagios_admin_passwd" {}
