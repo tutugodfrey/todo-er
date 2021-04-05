@@ -25,6 +25,25 @@ JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
 ANSIBLE_PASSWD=${ANSIBLE_PASSWD}
 
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$JUMP_SERVER_IP
+
+JUMP_SERVER_USER=${JUMP_SERVER_USER}
+JUMP_SERVER_USER_PW=${JUMP_SERVER_USER_PW}
+APP_SERVER_1_USER=${APP_SERVER_1_USER}
+APP_SERVER_1_USER_PW=${APP_SERVER_1_USER_PW}
+APP_SERVER_2_USER=${APP_SERVER_2_USER}
+APP_SERVER_2_USER_PW=${APP_SERVER_2_USER_PW}
+LB_SERVER_USER=${LB_SERVER_USER}
+LB_SERVER_USER_PW=${LB_SERVER_USER_PW}
+DB_SERVER_USER=${DB_SERVER_USER}
+DB_SERVER_USER_PW=${DB_SERVER_USER_PW}
+STORAGE_SERVER_USER=${STORAGE_SERVER_USER}
+STORAGE_SERVER_USER_PW=${STORAGE_SERVER_USER_PW}
+JENKINS_SERVER_USER=${JENKINS_SERVER_USER}
+JENKINS_SERVER_USER_PW=${JENKINS_SERVER_USER_PW}
+
 cat >> /etc/hosts <<EOF
 
 $JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
@@ -167,5 +186,93 @@ cat > gather-facts.yml <<EOF
           Host detail IP {{ ansible_facts.default_ipv4.address }}
           Hostname {{ ansible_facts.hostname }}
 EOF
+
+# Use ansible to create dedicated users for all our servers
+cat > create-user.yml <<EOF
+- name: Jump Server
+  hosts: jump
+  become: yes
+  - tasks:
+    - name: Create Jump server user
+      user:
+        name: ${JUMP_SERVER_USER}
+        password: ${JUMP_SERVER_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: App Server 1
+  hosts: app1
+  become: yes
+  - tasks:
+    - name: Create App server 1 user
+      user:
+        name: ${APP_SERVER_1_USER}
+        password: ${APP_SERVER_1_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: App Server 2
+  hosts: app2
+  become: yes
+  - tasks:
+    - name: Create App server 2 user
+      user:
+        name: ${APP_SERVER_2_USER}
+        password: ${APP_SERVER_2_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: LB Server
+  hosts: lb
+  become: yes
+  - tasks:
+    - name: Create LB server user
+      user:
+        name: ${LB_SERVER_USER}
+        password: ${LB_SERVER_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: DB Server
+  hosts: db
+  become: yes
+  - tasks:
+    - name: Create DB Server user
+      user:
+        name: ${DB_SERVER_USER}
+        password: ${DB_SERVER_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: Create Users
+  hosts: store
+  become: yes
+  - tasks:
+    - name: Create storage server user
+      user:
+        name: ${STORAGE_SERVER_USER}
+        password: ${STORAGE_SERVER_USER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: Jenkins Server
+  hosts: jenkins
+  become: yes
+  - tasks
+    - name: Create Jenkins user
+      user:
+        name: ${JENKINS_SERVER_USER}
+        password: ${JENKINS_SERVER_USER_PW}
+        groups:
+        - wheel
+        append: yes
+EOF
 ansible all -i inventory -m shell -a 'whoami' &2> /etc/ansible_answer.txt;
 ansible-playbook -i inventory gather-facts.yml;
+ansible-playbook -i inventory create-user.yml;
+
+
+
+
+
+

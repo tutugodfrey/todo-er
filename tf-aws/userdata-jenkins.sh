@@ -26,6 +26,7 @@ JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
 JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
+SERVER_IP=${JENKINS_SERVER_IP}
 NAGIOS_ADMIN_PASSWD=${NAGIOS_ADMIN_PASSWD}
 
 if [ $JENKINS_SERVER_HOSTNAME ]; then
@@ -49,6 +50,7 @@ EOF
 # Wait for puppet server to sign CA
 #PUPPET_WAIT_1
 
+# Add configuration for Ansible user
 #ANSIBLE_CONFIG
 
 # Wait for puppet server to apply copyssh.pp
@@ -58,7 +60,7 @@ EOF
 curl https://assets.nagios.com/downloads/nagiosci/install.sh | sh;
 yum install -y gcc glibc glibc-common wget \
     unzip httpd php gd gd-devel perl make postfix \
-    gettext automake autoconf wget openssl-devel \
+    gettext automake autoconf wget openssl openssl-devel \
     net-snmp net-snmp-utils epel-release perl-Net-SNMP -y;
 cd /tmp;
 wget -O nagioscore.tar.gz https://github.com/NagiosEnterprises/nagioscore/archive/nagios-4.4.6.tar.gz;
@@ -83,42 +85,134 @@ cd /tmp/nagios-plugins-release-2.2.1/;
 ./configure;
 make;
 make install;
-sed -i '/# You can specify individual object config files as shown below:/a cfg_dir=/usr/local/nagios/etc/servers' /usr/local/nagios/etc/nagios.cfg;
-mkdir /usr/local/nagios/etc/servers
-cat > /usr/local/nagios/etc/servers/centos.cfg <<EOF
+
+# Install Nagios NRPE Pligin
+cd /tmp/;
+wget https://github.com/NagiosEnterprises/nrpe/releases/download/nrpe-3.2.1/nrpe-3.2.1.tar.gz;
+tar zxvf nrpe-3.2.1.tar.gz;
+cd nrpe-3.2.1;
+./configure --enable-command-args --with-nrpe-user=nagios --with-nrpe-group=nagios;
+make all;
+make install-plugin;
+systemctl restart nagios;
+
+sed -i '/# You can specify individual object config files as shown below:/a cfg_dir=/usr/local/nagios/etc/objects/servers/' /usr/local/nagios/etc/nagios.cfg;
+mkdir /usr/local/nagios/etc/objects/servers/
+cat > /usr/local/nagios/etc/objects/servers/hosts.cfg <<EOF
 define host {
-  use linux-server
-  host_name $APP_SERVER_1_HOSTNAME
-  alias $APP_SERVER_1_HOSTNAME
-  address $APP_SERVER_1_IP
+  use                 manage-hosts
+  host_name           $APP_SERVER_1_HOSTNAME
+  alias               $APP_SERVER_1_HOSTNAME
+  address             $APP_SERVER_1_IP
 }
 
 define host {
-  use linux-server
-  host_name $APP_SERVER_2_HOSTNAME
-  alias $APP_SERVER_2_HOSTNAME
-  address $APP_SERVER_2_IP
+  use                 manage-hosts
+  host_name           $APP_SERVER_2_HOSTNAME
+  alias               $APP_SERVER_2_HOSTNAME
+  address             $APP_SERVER_2_IP
 }
 
 define host {
-  use linux-server
-  host_name $LB_SERVER_HOSTNAME
-  alias $LB_SERVER_HOSTNAME
-  address $LB_SERVER_IP
+  use                 manage-hosts
+  host_name           $LB_SERVER_HOSTNAME
+  alias               $LB_SERVER_HOSTNAME
+  address             $LB_SERVER_IP
 }
 
 define host {
-  use linux-server
-  host_name $STORAGE_SERVER_HOSTNAME
-  alias $STORAGE_SERVER_HOSTNAME
-  address $STORAGE_SERVER_IP
+  use                 manage-hosts
+  host_name           $STORAGE_SERVER_HOSTNAME
+  alias               $STORAGE_SERVER_HOSTNAME
+  address             $STORAGE_SERVER_IP
 }
 
 define host {
-  use linux-server
-  host_name $DB_SERVER_HOSTNAME
-  alias $DB_SERVER_HOSTNAME
-  address $DB_SERVER_IP
+  use                 manage-hosts
+  host_name           $DB_SERVER_HOSTNAME
+  alias               $DB_SERVER_HOSTNAME
+  address             $DB_SERVER_IP
+  # contact_groups admins
 }
 EOF
+
+cat > hostgroups.cfg <<EOF
+define hostgroup {
+  hostgroup_name appservers
+  alias     Linux Server
+  members   $APP_SERVER_1_HOSTNAME,$APP_SERVER_2_HOSTNAME
+}
+EOF
+
+cat > hosts-service-template.cfg  <<EOF
+define host {
+  name                      manage-hosts
+  notifications_enabled         1
+  event_handler_enabled         1
+  flap_detection_enabled        1
+  process_perf_data             1
+  retain_status_information     1
+  retain_nonstatus_information  1
+    check_command                check-host-alive
+    check_interval              5
+    max_check_attempts          2
+    notification_interval       0
+    notification_period         24x7
+    notification_options        d,u,r
+    register                    0
+    contact_groups              admins
+}
+
+
+# Define a service template
+
+define service {
+  name                  my-hosts-service
+  active_checks_enabled 1
+  passive_checks_enabled        1
+  parallelize_check             1
+  obsess_over_service           1
+  check_freshness               0
+  notifications_enabled         1
+  event_handler_enabled         1
+  flap_detection_enabled        1
+  process_perf_data             1
+  retain_status_information     1
+  retain_nonstatus_information  1
+  notification_interval         0
+  is_volatile                   0
+  check_period                  24x7
+  check_interval                5
+  retry_interval                1
+  max_check_attempts            2
+  notification_period           24x7
+  notification_options          w,u,c,r
+  contact_groups                admins
+  register                      0
+}
+EOF
+
+cat > contacts.cfg <<EOF
+define contact {
+  contact_name          godfrey
+  use                   generic-contact
+  alias                 Tutu Godfrey
+  email                 godfrey_tutu@yahoo.com
+}
+
+define contact {
+  contact_name          tutu
+  use                   generic-contact
+  alias                 Godfrey Tutu
+  email                 tutugodfrey@gmail.com
+}
+
+# Define contact group
+define contactgroup {
+  contactgroup_name     admins
+  alias                 admins
+  members               tutu,godfrey
+}
+EOF
+
 systemctl restart nagios;
