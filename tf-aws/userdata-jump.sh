@@ -271,7 +271,27 @@ ansible all -i inventory -m shell -a 'whoami' &2> /etc/ansible_answer.txt;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
 
+## Add configuration for prometheus node exporter
+#NODEEXPORTER
 
+## Create a systemd service for node exporter
+cat > /etc/systemd/system/node_exporter.service <<EOF 
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=nodeusr
+Group=nodeusr
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload;
+systemctl start node_exporter;
 
 
 

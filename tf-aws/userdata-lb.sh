@@ -102,3 +102,25 @@ until mount -a; do echo "waiting for nfs mount to succeed"; done;
 
 # Install and configure Nagios NRPE plugin
 #NRPE
+
+## Add configuration for prometheus node exporter
+#NODEEXPORTER
+
+## Create a systemd service for node exporter
+cat > /etc/systemd/system/node_exporter.service <<EOF 
+[Unit]
+Description=Node Exporter
+After=network.target
+
+[Service]
+User=nodeusr
+Group=nodeusr
+Type=simple
+ExecStart=/usr/local/bin/node_exporter
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload;
+systemctl start node_exporter;
