@@ -216,8 +216,8 @@ resource "aws_network_interface" "tod-app-server-1-eni" {
 data "template_file" "user-data-app-server-1" {
   template = file("userdata.sh")
   vars = {
-    NEW_HOSTNAME = var.app_server_1_hostname
-    SERVER_IP = var.app_server_1_private_ip
+    APP_SERVER_HOSTNAME = var.app_server_1_hostname
+    APP_SERVER_IP = var.app_server_1_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
     JUMP_SERVER_IP = var.jump_server_private_ip
@@ -264,8 +264,8 @@ resource "aws_network_interface" "tod-app-server-2-eni" {
 data "template_file" "user-data-app-server-2" {
   template = file("userdata.sh")
   vars = {
-    NEW_HOSTNAME = var.app_server_2_hostname
-    SERVER_IP = var.app_server_2_private_ip
+    APP_SERVER_HOSTNAME = var.app_server_2_hostname
+    APP_SERVER_IP = var.app_server_2_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
     JUMP_SERVER_IP = var.jump_server_private_ip
@@ -322,7 +322,8 @@ resource "aws_network_interface" "todo-app-lb-server-eni" {
 data "template_file" "user-data-lb-server" {
   template = file("userdata-lb.sh")
   vars = {
-    NEW_HOSTNAME = var.lb_server_hostname
+    LB_SERVER_HOSTNAME = var.lb_server_hostname
+    LB_SERVER_IP = var.lb_server_private_ip
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
@@ -617,6 +618,20 @@ data "template_file" "jump-server-template-file" {
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     ANSIBLE_PASSWD = var.ansible_passwd
+    JUMP_SERVER_USER = var.jump_server_user
+    JUMP_SERVER_USER_PW = var.jump_server_user_pw
+    APP_SERVER_1_USER = var.app_server_1_user
+    APP_SERVER_1_USER_PW = var.app_server_1_user_pw
+    APP_SERVER_2_USER = var.app_server_2_user
+    APP_SERVER_2_USER_PW = var.app_server_2_user_pw
+    LB_SERVER_USER = var.lb_server_user
+    LB_SERVER_USER_PW = var.lb_server_user_pw
+    DB_SERVER_USER = var.db_server_user
+    DB_SERVER_USER_PW = var.db_server_user_pw
+    STORAGE_SERVER_USER = var.storage_server_user
+    STORAGE_SERVER_USER_PW = var.storage_server_user_pw
+    JENKINS_SERVER_USER = var.jenkins_server_user
+    JENKINS_SERVER_USER_PW = var.jenkins_server_user_pw
   }
 }
 

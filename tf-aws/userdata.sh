@@ -6,7 +6,8 @@ if [ $? -ne 0 ]; then
   amazon-linux-extras install nginx1 -y;
 fi
 
-NEW_HOSTNAME=${NEW_HOSTNAME}
+APP_SERVER_HOSTNAME=${APP_SERVER_HOSTNAME}
+APP_SERVER_IP=${APP_SERVER_IP}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
 JUMP_SERVER_IP=${JUMP_SERVER_IP}
@@ -18,8 +19,12 @@ DB_USER_NAME=${DB_USER_NAME}
 DB_USER_PASS=${DB_USER_PASS}
 DB_PORT=${DB_PORT}
 
-if [ $NEW_HOSTNAME ]; then
-  hostnamectl set-hostname $NEW_HOSTNAME;
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$APP_SERVER_IP
+
+if [ $APP_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $APP_SERVER_HOSTNAME;
 fi;
 
 cat >> /etc/hosts <<EOF
@@ -107,8 +112,11 @@ systemctl start todoapp-watcher.{path,service}
 # Wait for puppet server to sign CA
 #PUPPET_WAIT_1
 
-# Apply ansible install and configuration
+# Add configuration for Ansible user
 #ANSIBLE_CONFIG
 
 # Wait for puppet server to apply copyssh.pp
 #PUPPET_WAIT_2
+
+# Install and configure Nagios NRPE plugin
+#NRPE

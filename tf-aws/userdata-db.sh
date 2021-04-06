@@ -12,6 +12,10 @@ VPC_CIDR_BLOCK=${VPC_CIDR_BLOCK}
 JUMP_SERVER_IP=${JUMP_SERVER_IP}
 JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$DB_SERVER_IP
+
 if [ DB_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $DB_SERVER_HOSTNAME
 fi;
@@ -56,7 +60,11 @@ sed -i "/# IPv4 local connections:/a host    todoapp        todoapp         10.0
 # Wait for puppet server to sign CA
 #PUPPET_WAIT_1
 
+# Add configuration for Ansible user
 #ANSIBLE_CONFIG
 
 # Wait for puppet server to apply copyssh.pp
 #PUPPET_WAIT_2
+
+# Install and configure Nagios NRPE plugin
+#NRPE

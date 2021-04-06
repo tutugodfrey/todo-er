@@ -21,11 +21,8 @@ sed -i 's/8080/80/' .env; # will remove after modify after update content of .en
 # sed -i 's/APPPORT/80/' .env;
 npm run build;
 
-NEW_HOSTNAME=${NEW_HOSTNAME}
-if [ $NEW_HOSTNAME ]; then
-  hostnamectl set-hostname $NEW_HOSTNAME;
-fi;
-
+LB_SERVER_HOSTNAME=${LB_SERVER_HOSTNAME}
+LB_SERVER_IP=${LB_SERVER_IP}
 APP_SERVER_1_IP=${APP_SERVER_1_IP}
 APP_SERVER_2_IP=${APP_SERVER_2_IP}
 APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME} 
@@ -34,6 +31,14 @@ JUMP_SERVER_IP=${JUMP_SERVER_IP}
 JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
+
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$LB_SERVER_IP
+
+if [ $LB_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $LB_SERVER_HOSTNAME;
+fi;
 
 cat >> /etc/hosts <<EOF
 
@@ -89,7 +94,11 @@ until mount -a; do echo "waiting for nfs mount to succeed"; done;
 # Wait for puppet server to sign CA
 #PUPPET_WAIT_1
 
+# Add configuration for Ansible user
 #ANSIBLE_CONFIG
 
 # Wait for puppet server to apply copyssh.pp
 #PUPPET_WAIT_2
+
+# Install and configure Nagios NRPE plugin
+#NRPE

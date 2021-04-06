@@ -21,6 +21,11 @@ DB_USER_NAME=${DB_USER_NAME}
 DB_USER_PASS=${DB_USER_PASS}
 DB_PORT=${DB_PORT}
 
+
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$STORAGE_SERVER_IP
+
 if [ $STORAGE_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $STORAGE_SERVER_HOSTNAME
 fi
@@ -84,7 +89,11 @@ cd /;
 # Wait for puppet server to sign CA
 #PUPPET_WAIT_1
 
+# Add configuration for Ansible user
 #ANSIBLE_CONFIG
 
 # Wait for puppet server to apply copyssh.pp
 #PUPPET_WAIT_2
+
+# Install and configure Nagios NRPE plugin
+#NRPE
