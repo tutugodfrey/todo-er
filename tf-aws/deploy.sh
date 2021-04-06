@@ -94,6 +94,13 @@ sed -i 's/allowed_hosts=127.0.0.1,::1/allowed_hosts=127.0.0.1,::1,${SERVER_IP},$
 sed -i 's/dont_blame_nrpe=0/dont_blame_nrpe=1/' /usr/local/nagios/etc/nrpe.cfg;
 EOF
 
+cat > nodeexporter <<EOF
+wget https://github.com/prometheus/node_exporter/releases/download/v1.1.2/node_exporter-1.1.2.linux-amd64.tar.gz; \
+tar -xvzf node_exporter-1.1.2.linux-amd64.tar.gz; \
+useradd -rs /bin/false nodeusr; \
+mv node_exporter-1.1.2.linux-amd64/node_exporter  /usr/local/bin/;
+EOF
+
 PUPPET_WAIT_1='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Wait for puppet CA Signing; sleep 3; ((counter++)); done;'
 PUPPET_WAIT_2='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Attempting pull for ansible ssh key; sleep 3; ((counter++)); done;'
 
@@ -105,6 +112,7 @@ sed -i -e "s/PUPPET_WAIT_1/&\n$(echo $PUPPET_WAIT_1)/" {userdata,userdata-jenkin
 sed -i -e "s|#ANSIBLE_CONFIG|$(cat ansible)|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e "s/#PUPPET_WAIT_2/&\n$(echo $PUPPET_WAIT_2)/" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e "s|#NRPE|$(cat nrpe)|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
+sed -i -e "s|#NODEEXPORTER|$(cat nodeexporter)|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 
 # EXECUTE TERRAFORM APPLY
 terraform apply --auto-approve -var-file devars.tfvars
@@ -139,6 +147,7 @@ sed -i -e '/#PUPPET_WAIT_1/{n;d;}' {userdata,userdata-jenkins,userdata-db,userda
 sed -i -e "s|$(cat ansible)|#ANSIBLE_CONFIG|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e '/#PUPPET_WAIT_2/{n;d;}' {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e "s|$(cat nrpe)|#NRPE|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
+sed -i -e "s|$(cat nodeexporter)|#NODEEXPORTER|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 
 # sed -i -e '/#PUPPET_WAIT_2/{n;d;}' exclusive
 # sed -i -e '/#PUPPET_WAIT_2/{N;d;}' example of inclusive delete
