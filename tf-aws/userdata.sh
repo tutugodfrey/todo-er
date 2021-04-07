@@ -142,3 +142,6 @@ EOF
 
 systemctl daemon-reload;
 systemctl start node_exporter;
+
+## Install and configure Zabbix agent
+#ZABBIXAGENT

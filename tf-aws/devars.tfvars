@@ -52,3 +52,8 @@ storage_server_user = "STORAGE_SERVER_USER"
 storage_server_user_pw = "STORAGE_SERVER_USERpwd"
 jenkins_server_user = "JENKINS_SERVER_USER"
 jenkins_server_user_pw = "JENKINS_SERVER_USERpwd"
+
+## Zabbix User
+zabbix_username = "ZABBIX_USERNAME"
+zabbix_db = "ZABBIX_DB"
+zabbix_ps = "ZABBIX_PS"

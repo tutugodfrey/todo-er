@@ -36,3 +36,6 @@ variable "db_port" {
 
 variable "ansible_passwd" {}
 variable "nagios_admin_passwd" {}
+variable zabbix_username {}
+variable zabbix_db {}
+variable zabbix_ps {}
