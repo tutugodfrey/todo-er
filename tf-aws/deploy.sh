@@ -153,4 +153,4 @@ sed -i -e "s|$(cat nodeexporter)|#NODEEXPORTER|" {userdata,userdata-db,userdata-
 # sed -i -e '/#PUPPET_WAIT_2/{N;d;}' example of inclusive delete
 
 # Were are not keeping the files
-rm {puppet,ansible,nrpe}
+rm {puppet,ansible,nrpe,nodeexporter}
