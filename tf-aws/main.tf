@@ -383,6 +383,9 @@ data "template_file" "jenkins-server-template" {
     JUMP_SERVER_IP = var.jump_server_private_ip
     JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     NAGIOS_ADMIN_PASSWD = var.nagios_admin_passwd
+    ZABBIX_USERNAME = var.zabbix_username
+    ZABBIX_DB = var.zabbix_db
+    ZABBIX_PS = var.zabbix_ps
   }
 }
 

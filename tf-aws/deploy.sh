@@ -15,6 +15,9 @@ DB_USERNAME=${DB_USERNAME}
 DB_PASSWD=${DB_PASSWD}
 ANSIBLE_PASSWD=${ANSIBLE_PASSWD}
 NAGIOS_ADMIN_PASSWD=${NAGIOS_ADMIN_PASSWD}
+ZABBIX_USERNAME=${ZABBIX_USERNAME}
+ZABBIX_DB=${ZABBIX_DB}
+ZABBIX_PS=${ZABBIX_PS}
 
 sed -i -e "s/DB_NAME/${DB_NAME}/" devars.tfvars
 sed -i -e "s/DB_USERNAME/${DB_USERNAME}/" devars.tfvars
@@ -37,6 +40,9 @@ sed -i -e "s/STORAGE_SERVER_USER/${STORAGE_SERVER_USER}/" devars.tfvars
 sed -i -e "s/STORAGE_SERVER_USER_PW/${STORAGE_SERVER_USER_PW}/" devars.tfvars
 sed -i -e "s/JENKINS_SERVER_USER/${JENKINS_SERVER_USER}/" devars.tfvars
 sed -i -e "s/JENKINS_SERVER_USER_PW/${JENKINS_SERVER_USER_PW}/" devars.tfvars
+sed -i -e "s/ZABBIX_USERNAME/${ZABBIX_USERNAME}/" devars.tfvars
+sed -i -e "s/ZABBIX_DB/${ZABBIX_DB}/" devars.tfvars
+sed -i -e "s/ZABBIX_PS/${ZABBIX_PS}/" devars.tfvars
 
 cat > puppet <<EOF
 rpm -Uvh https://yum.puppet.com/puppet/puppet-release-el-7.noarch.rpm; \
@@ -101,6 +107,15 @@ useradd -rs /bin/false nodeusr; \
 mv node_exporter-1.1.2.linux-amd64/node_exporter  /usr/local/bin/;
 EOF
 
+cat > zabbixagent <<EOF
+rpm -ivh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm; \
+yum install zabbix-agent -y; \
+sed -i "s/ServerActive=127.0.0.1/ServerActive=${SERVER_IP}/" /etc/zabbix/zabbix_agentd.conf; \
+sed -i "s/Server=127.0.0.1/Server=${SERVER_IP}/" /etc/zabbix/zabbix_agentd.conf; \
+sed -i "s/Hostname=Zabbix server/Hostname=master/" /etc/zabbix/zabbix_agentd.conf; \
+systemctl enable --now zabbix-agent;
+EOF
+
 PUPPET_WAIT_1='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Wait for puppet CA Signing; sleep 3; ((counter++)); done;'
 PUPPET_WAIT_2='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Attempting pull for ansible ssh key; sleep 3; ((counter++)); done;'
 
@@ -113,6 +128,7 @@ sed -i -e "s|#ANSIBLE_CONFIG|$(cat ansible)|" {userdata,userdata-jenkins,userdat
 sed -i -e "s/#PUPPET_WAIT_2/&\n$(echo $PUPPET_WAIT_2)/" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e "s|#NRPE|$(cat nrpe)|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 sed -i -e "s|#NODEEXPORTER|$(cat nodeexporter)|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
+sed -i -e "s|#ZABBIXAGENT|$(cat zabbixagent)|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 
 # EXECUTE TERRAFORM APPLY
 terraform apply --auto-approve -var-file devars.tfvars
@@ -140,6 +156,9 @@ sed -i -e "s/${STORAGE_SERVER_USER}/STORAGE_SERVER_USER/" devars.tfvars
 sed -i -e "s/${STORAGE_SERVER_USER_PW}/STORAGE_SERVER_USER_PW/" devars.tfvars
 sed -i -e "s/${JENKINS_SERVER_USER}/JENKINS_SERVER_USER/" devars.tfvars
 sed -i -e "s/${JENKINS_SERVER_USER_PW}/JENKINS_SERVER_USER_PW/" devars.tfvars
+sed -i -e "s/${ZABBIX_USERNAME}/ZABBIX_USERNAME/" devars.tfvars
+sed -i -e "s/${ZABBIX_DB}/ZABBIX_DB/" devars.tfvars
+sed -i -e "s/${ZABBIX_PS}/ZABBIX_PS/" devars.tfvars
 
 # Reverse the content of the userdata scripts to their original state
 sed -i -e "s|$(cat puppet)|#PUPPET_CONFIG|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
@@ -148,9 +167,10 @@ sed -i -e "s|$(cat ansible)|#ANSIBLE_CONFIG|" {userdata,userdata-jenkins,userdat
 sed -i -e '/#PUPPET_WAIT_2/{n;d;}' {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage}.sh
 sed -i -e "s|$(cat nrpe)|#NRPE|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 sed -i -e "s|$(cat nodeexporter)|#NODEEXPORTER|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
+sed -i -e "s|$(cat zabbixagent)|#ZABBIXAGENT|" {userdata,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 
 # sed -i -e '/#PUPPET_WAIT_2/{n;d;}' exclusive
 # sed -i -e '/#PUPPET_WAIT_2/{N;d;}' example of inclusive delete
 
 # Were are not keeping the files
-rm {puppet,ansible,nrpe,nodeexporter}
+rm {puppet,ansible,nrpe,nodeexporter,zabbixagent}
