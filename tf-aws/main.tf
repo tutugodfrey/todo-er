@@ -89,7 +89,7 @@ resource "aws_internet_gateway" "todo-app-igw" {
 resource "aws_route" "todo-app-igw-route" {
   route_table_id = aws_route_table.todo-app-public-route-table.id
   gateway_id = aws_internet_gateway.todo-app-igw.id 
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = [var.public_cidr]
 }
 
 # ### CREATE A EC2 NAT GATEWAY INSTANCE
@@ -130,79 +130,205 @@ resource "aws_nat_gateway" "todo-app-nat-gateway" {
 resource "aws_route" "todo-app-nat-route" {
   route_table_id = aws_route_table.todo-app-private-route-table.id
   nat_gateway_id = aws_nat_gateway.todo-app-nat-gateway.id 
-  destination_cidr_block = "0.0.0.0/0"
+  destination_cidr_block = [var.public_cidr]
 }
 
 ### MANAGE SECURITY GROUPS
 resource "aws_security_group" "todo-app-web-access-sg" {
   name = "todo-app-web-access-sg"
   vpc_id = aws_vpc.todo-app-vpc.id
-
-  ingress {
-    from_port = 0
-    to_port  = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol = "-1"
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol = "-1"
-  }
-
   tags = {
     Name = "todo-app-web-access-sg"
   }
 }
 
-resource "aws_security_group" "todo-app-jenkins-server-sg" {
-  name = "todo-app-jenkins-server-sg"
-  vpc_id = aws_vpc.todo-app-vpc.id
-}
-
-resource "aws_security_group_rule" "allow-all-egress" {
+resource "aws_security_group_rule" "allow-port-all-egress" {
   type = "egress"
   from_port = 0
   to_port = 0
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = [var.public_cidr]
   protocol = "-1"
-  security_group_id = aws_security_group.todo-app-jenkins-server-sg.id
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
 }
 
-resource "aws_security_group_rule" "allow_port_8080" {
+resource "aws_security_group_rule" "allow_port_80" {
   type = "ingress"
   from_port = 80
   to_port = 80
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = [var.public_cidr]
   protocol = "tcp"
-  security_group_id = aws_security_group.todo-app-jenkins-server-sg.id
-}
-
-resource "aws_security_group_rule" "allow-port-ssh" {
-  type = "ingress"
-  from_port = 22
-  to_port = 22
-  cidr_blocks = ["0.0.0.0/0"]
-  protocol = "tcp"
-  security_group_id = aws_security_group.todo-app-jenkins-server-sg.id
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
 }
 
 resource "aws_security_group_rule" "allow-port-8080" {
   type = "ingress"
   from_port = 8080
   to_port = 8080
-  cidr_blocks = ["0.0.0.0/0"]
+  cidr_blocks = [var.public_cidr]
   protocol = "tcp"
-  security_group_id = aws_security_group.todo-app-jenkins-server-sg.id
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+resource "aws_security_group_rule" "allow-port-443" {
+  type = "ingress"
+  from_port = 443
+  to_port = 443
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+resource "aws_security_group_rule" "allow-icmp" {
+  type = "ingress"
+  from_port = -1
+  to_port = -1
+  cidr_blocks = [var.public_cidr]
+  protocol = "icmp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+## Allow ssh betten servers in the network
+resource "aws_security_group_rule" "todo-app-internal-ssh-sg" {
+  type = "ingress"
+  from_port = 22
+  to_port = 22
+  cidr_blocks = [var.vpc_cidr_block]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+## Puppetserver sg
+resource "aws_security_group_rule" "todo-app-puppet-sg" {
+  type = "ingress"
+  from_port = 0
+  to_port = 8140
+  cidr_blocks = [var.vpc_cidr_block]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+## NFS port 2049 for tcp 
+resource "aws_security_group_rule" "todo-app-allow-nfs-tcp" {
+  type = "ingress"
+  from_port = 2049
+  to_port = 2049
+  cidr_blocks = [var.vpc_cidr_block]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+# NFS port 2049 for udp
+resource "aws_security_group_rule" "todo-app-allow-nfs-udp" {
+  type = "ingress"
+  from_port = 2049
+  to_port = 2049
+  cidr_blocks = [var.vpc_cidr_block]
+  protocol = "udp"
+  security_group_id = aws_security_group.todo-app-web-access-sg.id
+}
+
+# Allow ssh connection from external network. 
+# Should only be attached to Admin servers. e.g Jump server and metric server
+resource "aws_security_group" "todo-app-external-ssh-sg" {
+  vpc_id = aws_vpc.todo-app-vpc.id
+  name = "todo-app-external-ssh-sg"
+  ingress {
+    from_port = 22
+    to_port = 22
+    cidr_blocks = [var.public_cidr]
+    protocol = "tcp"
+  }
+  tags = {
+    Name = "todo-app-external-ssh-sg"
+  }
+}
+
+## SG to access DB server within the network
+resource "aws_security_group" "todo-app-db-server-sg" {
+  name = "todo-app-db-server-sg"
+  vpc_id = aws_vpc.todo-app-vpc.id
+
+  ingress {
+    from_port = 0
+    to_port  = 5432
+    cidr_blocks = [var.vpc_cidr_block]
+    protocol = "tcp"
+  }
+  tags = {
+    Name = "todo-app-db-server-sg"
+  }
+}
+
+resource "aws_security_group" "todo-app-metric-server-sg" {
+  name = "todo-app-metric-server-sg"
+  vpc_id = aws_vpc.todo-app-vpc.id
+  tags = {
+    Name = "todo-app-metric-server-sg"
+  }
+}
+
+resource "aws_security_group_rule" "allow-prometheus-port-9090" {
+  type = "ingress"
+  from_port = 9090
+  to_port = 9090
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
+}
+
+resource "aws_security_group_rule" "allow-node-exporter-port-9100" {
+  type = "ingress"
+  from_port = 9100
+  to_port = 9100
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
+}
+
+resource "aws_security_group_rule" "allow-grafana-port-3000" {
+  type = "ingress"
+  from_port = 3000
+  to_port = 3000
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
+}
+
+resource "aws_security_group_rule" "allow-zabbix-agent-port-10050" {
+  type = "ingress"
+  from_port = 10050
+  to_port = 10050
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
+}
+
+resource "aws_security_group_rule" "allow-zabbix-server-port-10051" {
+  type = "ingress"
+  from_port = 10051
+  to_port = 10051
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
+}
+
+resource "aws_security_group_rule" "allow-nagios-nrpe-port-5666" {
+  type = "ingress"
+  from_port = 5666
+  to_port = 5666
+  cidr_blocks = [var.public_cidr]
+  protocol = "tcp"
+  security_group_id = aws_security_group.todo-app-metric-server-sg.id
 }
 
 resource "aws_network_interface" "tod-app-server-1-eni" {
-  # subnet_id = aws_subnet.todo-app-public-subnet-a.id
   subnet_id = aws_subnet.todo-app-private-subnet-a.id
   private_ips = [ var.app_server_1_private_ip ]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
+  security_groups = [
+  aws_security_group.todo-app-metric-server-sg.id,
+  aws_security_group.todo-app-web-access-sg.id,
+  aws_security_group.todo-app-db-server-sg.id,
+  ]
   attachment {
     instance = aws_instance.todo-app-server-1.id
     device_index = 1
@@ -216,12 +342,16 @@ resource "aws_network_interface" "tod-app-server-1-eni" {
 data "template_file" "user-data-app-server-1" {
   template = file("userdata.sh")
   vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     APP_SERVER_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_IP = var.app_server_1_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
-    JUMP_SERVER_IP = var.jump_server_private_ip
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     DB_NAME = var.db_name
@@ -235,8 +365,11 @@ resource "aws_instance" "todo-app-server-1" {
   ami = var.app_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  security_groups = [aws_security_group.todo-app-web-access-sg.id]
-  # subnet_id = aws_subnet.todo-app-public-subnet-a.id
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-db-server-sg.id,
+  ]
   subnet_id = aws_subnet.todo-app-private-subnet-a.id
   user_data = data.template_file.user-data-app-server-1.rendered
   associate_public_ip_address = true
@@ -246,16 +379,18 @@ resource "aws_instance" "todo-app-server-1" {
   }
 }
 
-resource "aws_network_interface" "tod-app-server-2-eni" {
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+resource "aws_network_interface" "todo-app-server-2-eni" {
+  subnet_id = aws_subnet.todo-app-private-subnet-b.id
   private_ips = [ var.app_server_2_private_ip ]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-db-server-sg.id,
+  ]
   attachment {
     instance = aws_instance.todo-app-server-2.id
     device_index = 1
   }
-
   tags = {
     Name = "App server 2 eni"
   }
@@ -264,12 +399,16 @@ resource "aws_network_interface" "tod-app-server-2-eni" {
 data "template_file" "user-data-app-server-2" {
   template = file("userdata.sh")
   vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     APP_SERVER_HOSTNAME = var.app_server_2_hostname
     APP_SERVER_IP = var.app_server_2_private_ip
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
-    JUMP_SERVER_IP = var.jump_server_private_ip
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     DB_NAME = var.db_name
@@ -283,32 +422,37 @@ resource "aws_instance" "todo-app-server-2" {
   ami = var.app_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  security_groups = [aws_security_group.todo-app-web-access-sg.id]
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-db-server-sg.id,
+  ]
+  subnet_id = aws_subnet.todo-app-private-subnet-b.id
   user_data = data.template_file.user-data-app-server-2.rendered
   associate_public_ip_address = true
-
   tags = {
     Name = "App Server 2"
   }
 }
 
-# SET UP A LOAD BALANCER SERVER
+## SET UP A LOAD BALANCER SERVER
 # provision an elastic ip for the load balancer
-resource "aws_eip" "todo-app-lb-eip" {
+/* resource "aws_eip" "todo-app-lb-eip" {
   vpc = true
   instance = aws_instance.todo-app-lb-server.id
 
   tags = {
     Name = "LoadBalancer Server EIP"
   }
-}
+} */
 
 resource "aws_network_interface" "todo-app-lb-server-eni" {
   subnet_id = aws_subnet.todo-app-public-subnet-b.id
   private_ips = [var.lb_server_private_ip]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id]
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ] 
   attachment {
     instance = aws_instance.todo-app-lb-server.id
     device_index = 1
@@ -322,14 +466,18 @@ resource "aws_network_interface" "todo-app-lb-server-eni" {
 data "template_file" "user-data-lb-server" {
   template = file("userdata-lb.sh")
   vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     LB_SERVER_HOSTNAME = var.lb_server_hostname
     LB_SERVER_IP = var.lb_server_private_ip
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
     APP_SERVER_2_IP = var.app_server_2_private_ip
-    JUMP_SERVER_IP = var.jump_server_private_ip
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
     STORAGE_SERVER_IP = var.storage_server_private_ip
   }
@@ -339,22 +487,26 @@ resource "aws_instance" "todo-app-lb-server" {
   ami = var.app_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  security_groups = [aws_security_group.todo-app-web-access-sg.id]
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ]
   subnet_id = aws_subnet.todo-app-public-subnet-b.id
   user_data = data.template_file.user-data-lb-server.rendered
   associate_public_ip_address = true
-
   tags = {
     Name = "Load Balancer"
   }
 }
 
-# SET UP A JENKINS SERVER INSTANCE
+## SET UP A JENKINS SERVER INSTANCE
 resource "aws_network_interface" "todo-app-jenkins-server-eni" {
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+  subnet_id = aws_subnet.todo-app-public-subnet-a.id
   private_ips = [var.jenkins_server_private_ip]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id]
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ]
   attachment {
     instance = aws_instance.todo-app-jenkins-server.id
     device_index = 1
@@ -368,8 +520,12 @@ resource "aws_network_interface" "todo-app-jenkins-server-eni" {
 data "template_file" "jenkins-server-template" {
   template = file("userdata-jenkins.sh")
   vars  = {
-    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
     JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_IP = var.app_server_2_private_ip
@@ -379,9 +535,7 @@ data "template_file" "jenkins-server-template" {
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     LB_SERVER_IP = var.lb_server_private_ip
-    LB_SERVER_HOSTNAME =var.lb_server_hostname
-    JUMP_SERVER_IP = var.jump_server_private_ip
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
+    LB_SERVER_HOSTNAME = var.lb_server_hostname
     NAGIOS_ADMIN_PASSWD = var.nagios_admin_passwd
     ZABBIX_USERNAME = var.zabbix_username
     ZABBIX_DB = var.zabbix_db
@@ -393,8 +547,11 @@ resource "aws_instance" "todo-app-jenkins-server" {
   ami = var.jenkins_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  security_groups = [aws_security_group.todo-app-jenkins-server-sg.id]
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ]
+  subnet_id = aws_subnet.todo-app-public-subnet-a.id
   user_data = data.template_file.jenkins-server-template.rendered
   associate_public_ip_address = true
   tags = {
@@ -432,63 +589,18 @@ resource "aws_instance" "todo-app-jenkins-server" {
 # }
 
 ## SETUP A DATABASE SERVER WITH POSTGRESQL
-# resource "aws_security_group" "todo-app-db-server-sg" {
-#   name = "todo-app-db-server-security-group"
-#   vpc_id = aws_vpc.todo-app-vpc.id
-# }
-
-# resource "aws_security_group_rule" "db-server-sg-allow-5432" {
-#   type = "ingress"
-#   from_port = 0
-#   to_port = 5432
-#   cidr_blocks = [ var.vpc_cidr_block ]
-#   security_group_id = aws_security_group.todo-app-db-server-sg.id
-#   protocol = "tcp"
-# }
-
-# resource "aws_security_group_rule" "db-server-sg-allow-all-ingress" {
-#   type = "ingress"
-#   from_port = 0
-#   to_port = 0
-#   cidr_blocks = [ "0.0.0.0/0" ]
-#   security_group_id = aws_security_group.todo-app-db-server-sg.id
-#   protocol = "tcp"
-# }
-
-resource "aws_security_group" "todo-app-db-server-sg" {
-  name = "todo-app-db-server-sg"
-  vpc_id = aws_vpc.todo-app-vpc.id
-
-  ingress {
-    from_port = 0
-    to_port  = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol = "-1"
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    protocol = "-1"
-  }
-
-  tags = {
-    Name = "todo-app-db-server-sg"
-  }
-}
-
 resource "aws_network_interface" "todo-app-db-server-eni" {
   subnet_id = aws_subnet.todo-app-private-subnet-b.id
   private_ips = [var.db_server_private_ip]
-  security_groups = [ aws_security_group.todo-app-db-server-sg.id ]
-  # security_groups = [ aws_security_group.todo-app-web-access-sg.id,
-    # aws_security_group.todo-app-db-server-sg.id ]
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-db-server-sg.id,
+  ]
   attachment {
     instance = aws_instance.todo-app-db-server.id
     device_index = 1
   }
-
   tags = {
     Name = "DB-server eni"
   }
@@ -498,10 +610,14 @@ data "template_file" "db-server-template-file" {
   template = file("userdata-db.sh")
   vars = {
     VPC_CIDR_BLOCK = var.vpc_cidr_block
-    DB_SERVER_IP = var.db_server_private_ip
-    DB_SERVER_HOSTNAME = var.db_server_hostname
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
     JUMP_SERVER_IP = var.jump_server_private_ip
     JUMP_SERVER_HOSTNAME = var.jump_server_hostname
+    DB_SERVER_IP = var.db_server_private_ip
+    DB_SERVER_HOSTNAME = var.db_server_hostname    
     DB_NAME = var.db_name
     DB_USER_PASS = var.db_user_pass
     DB_USER_NAME = var.db_user_name
@@ -513,12 +629,13 @@ resource "aws_instance" "todo-app-db-server" {
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
   subnet_id = aws_subnet.todo-app-private-subnet-b.id
-  security_groups = [ aws_security_group.todo-app-db-server-sg.id ]
-  # security_groups = [ aws_security_group.todo-app-web-access-sg.id,
-  #   aws_security_group.todo-app-db-server-sg.id ]
   associate_public_ip_address = true
   user_data = data.template_file.db-server-template-file.rendered
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-db-server-sg.id,
+  ]
   tags = {
     Name = "DB Server"
   }
@@ -526,10 +643,12 @@ resource "aws_instance" "todo-app-db-server" {
 
 ## SET UP A STORAGE SERVER
 resource "aws_network_interface" "todo-app-storage-server-eni" {
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+  subnet_id = aws_subnet.todo-app-private-subnet-a.id
   private_ips = [var.storage_server_private_ip]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ]
   attachment {
     instance = aws_instance.todo-app-storage-server.id
     device_index = 1
@@ -543,18 +662,20 @@ resource "aws_network_interface" "todo-app-storage-server-eni" {
 data "template_file" "storage-server-template-file" {
   template = file("userdata-storage.sh")
   vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_IP = var.app_server_2_private_ip
     APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
     LB_SERVER_IP = var.lb_server_private_ip
     LB_SERVER_HOSTNAME = var.lb_server_hostname
-    JENKINS_SERVER_IP = var.jenkins_server_private_ip
-    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
-    JUMP_SERVER_IP = var.jump_server_private_ip
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
     DB_NAME = var.db_name
@@ -568,12 +689,77 @@ resource "aws_instance" "todo-app-storage-server" {
   ami = var.app_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  subnet_id = aws_subnet.todo-app-public-subnet-b.id
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
+  subnet_id = aws_subnet.todo-app-private-subnet-a.id
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+  ]
   user_data = data.template_file.storage-server-template-file.rendered
   associate_public_ip_address = true
   tags = {
     Name = "Storage Server"
+  }
+}
+
+## SET UP A METRIC SERVER
+resource "aws_network_interface" "todo-app-metric-server-eni" {
+  subnet_id = aws_subnet.todo-app-public-subnet-a.id
+  private_ips = [ var.metric_server_private_ip ]
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-external-ssh-sg.id,
+  ]
+  attachment {
+    instance = aws_instance.todo-app-metric-server.id
+    device_index = 1
+  }
+  tags = {
+    Name = "Metric Server ENI"
+  }
+}
+
+data "template_file" "metric-server-template-file" {
+  template = file("userdata-metrics.sh")
+  vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
+    APP_SERVER_1_IP = var.app_server_1_private_ip
+    APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
+    APP_SERVER_2_IP = var.app_server_2_private_ip
+    APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
+    STORAGE_SERVER_IP = var.storage_server_private_ip
+    STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
+    DB_SERVER_IP = var.db_server_private_ip
+    DB_SERVER_HOSTNAME = var.db_server_hostname
+    LB_SERVER_IP = var.lb_server_private_ip
+    LB_SERVER_HOSTNAME =var.lb_server_hostname
+    NAGIOS_ADMIN_PASSWD = var.nagios_admin_passwd
+    ZABBIX_USERNAME = var.zabbix_username
+    ZABBIX_DB = var.zabbix_db
+    ZABBIX_PS = var.zabbix_ps
+  }
+}
+
+resource "aws_instance" "todo-app-metric-server" {
+  ami = var.app_server_ami_id
+  instance_type = var.ec2_instance_type
+  key_name = var.ec2_keypair
+  subnet_id = aws_subnet.todo-app-public-subnet-a.id
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-external-ssh-sg.id,
+  ]
+  user_data = data.template_file.metric-server-template-file.rendered
+  associate_public_ip_address = true
+
+  tags = {
+    Name = "Metrics Server"
   }
 }
 
@@ -590,13 +776,16 @@ resource "aws_instance" "todo-app-storage-server" {
 resource "aws_network_interface" "todo-app-jump-server-eni" {
   subnet_id = aws_subnet.todo-app-public-subnet-b.id
   private_ips = [var.jump_server_private_ip]
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
-
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-external-ssh-sg.id,
+  ]
+  /* security_groups = [ aws_security_group.todo-app-web-access-sg.id ] */
   attachment {
     instance = aws_instance.todo-app-jump-server.id
     device_index = 1
   }
-
   tags = {
     Name = "Jump server network interface"
   }
@@ -606,35 +795,41 @@ data "template_file" "jump-server-template-file" {
   template = file("userdata-jump.sh")
 
   vars = {
+    METRIC_SERVER_HOSTNAME = var.metric_server_hostname
+    METRIC_SERVER_IP = var.metric_server_private_ip
+    JENKINS_SERVER_IP = var.jenkins_server_private_ip
+    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
+    JUMP_SERVER_IP = var.jump_server_private_ip
+    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     APP_SERVER_1_IP = var.app_server_1_private_ip
     APP_SERVER_1_HOSTNAME = var.app_server_1_hostname
     APP_SERVER_2_IP = var.app_server_2_private_ip
     APP_SERVER_2_HOSTNAME = var.app_server_2_hostname
     LB_SERVER_IP = var.lb_server_private_ip
     LB_SERVER_HOSTNAME = var.lb_server_hostname
-    JENKINS_SERVER_IP = var.jenkins_server_private_ip
-    JENKINS_SERVER_HOSTNAME = var.jenkins_server_hostname
     STORAGE_SERVER_IP = var.storage_server_private_ip
     STORAGE_SERVER_HOSTNAME = var.storage_server_hostname
-    JUMP_SERVER_IP = var.jump_server_private_ip    
-    JUMP_SERVER_HOSTNAME = var.jump_server_hostname
     DB_SERVER_IP = var.db_server_private_ip
     DB_SERVER_HOSTNAME = var.db_server_hostname
+    
+    # server users details
     ANSIBLE_PASSWD = var.ansible_passwd
-    JUMP_SERVER_USER = var.jump_server_user
-    JUMP_SERVER_USER_PW = var.jump_server_user_pw
-    APP_SERVER_1_USER = var.app_server_1_user
-    APP_SERVER_1_USER_PW = var.app_server_1_user_pw
-    APP_SERVER_2_USER = var.app_server_2_user
-    APP_SERVER_2_USER_PW = var.app_server_2_user_pw
-    LB_SERVER_USER = var.lb_server_user
-    LB_SERVER_USER_PW = var.lb_server_user_pw
-    DB_SERVER_USER = var.db_server_user
-    DB_SERVER_USER_PW = var.db_server_user_pw
-    STORAGE_SERVER_USER = var.storage_server_user
-    STORAGE_SERVER_USER_PW = var.storage_server_user_pw
-    JENKINS_SERVER_USER = var.jenkins_server_user
-    JENKINS_SERVER_USER_PW = var.jenkins_server_user_pw
+    APP_SERVER_1_USERNAME = var.app_server_1_username
+    APP_SERVER_1_PW = var.app_server_1_pw
+    APP_SERVER_2_USERNAME = var.app_server_2_username
+    APP_SERVER_2_PW = var.app_server_2_pw
+    LB_SERVER_USERNAME = var.lb_server_username
+    LB_SERVER_PW = var.lb_server_pw
+    DB_SERVER_USERNAME = var.db_server_username
+    DB_SERVER_PW = var.db_server_pw
+    STORAGE_SERVER_USERNAME = var.storage_server_username
+    STORAGE_SERVER_PW = var.storage_server_pw
+    JENKINS_SERVER_USERNAME = var.jenkins_server_username
+    JENKINS_SERVER_PW = var.jenkins_server_pw
+    JUMP_SERVER_USERNAME = var.jump_server_username
+    JUMP_SERVER_PW = var.jump_server_pw
+    METRIC_SERVER_USERNAME = var.metric_server_username
+    METRIC_SERVER_PW = var.metric_server_pw
   }
 }
 
@@ -642,7 +837,11 @@ resource "aws_instance" "todo-app-jump-server" {
   ami = var.app_server_ami_id
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
-  security_groups = [ aws_security_group.todo-app-web-access-sg.id ]
+  security_groups = [
+    aws_security_group.todo-app-metric-server-sg.id,
+    aws_security_group.todo-app-web-access-sg.id,
+    aws_security_group.todo-app-external-ssh-sg.id,
+  ]
   subnet_id = aws_subnet.todo-app-public-subnet-b.id
   user_data = data.template_file.jump-server-template-file.rendered
   associate_public_ip_address = true

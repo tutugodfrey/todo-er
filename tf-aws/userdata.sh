@@ -1,17 +1,15 @@
 #! /bin/bash
 
-yum install git -y;
-yum install nginx -y;
-if [ $? -ne 0 ]; then
-  amazon-linux-extras install nginx1 -y;
-fi
-
+METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
+METRIC_SERVER_IP=${METRIC_SERVER_IP}
+JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
+JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 APP_SERVER_HOSTNAME=${APP_SERVER_HOSTNAME}
 APP_SERVER_IP=${APP_SERVER_IP}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
-JUMP_SERVER_IP=${JUMP_SERVER_IP}
-JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
 DB_SERVER_IP=${DB_SERVER_IP}
 DB_NAME=${DB_NAME}
@@ -23,14 +21,28 @@ DB_PORT=${DB_PORT}
 # refer to ./deploy.sh script
 SERVER_IP=$APP_SERVER_IP
 
+yum update -y;
+# Add epel repository if not already install
+#ADD_EPEL_REPO
+
+# Install yum config manager if not present
+#YUM_CONFIG_MANAGER
+
 if [ $APP_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $APP_SERVER_HOSTNAME;
 fi;
+
+yum install git -y;
+yum install nginx -y;
+if [ $? -ne 0 ]; then
+  amazon-linux-extras install nginx1 -y;
+fi
 
 cat >> /etc/hosts <<EOF
 $STORAGE_SERVER_IP       $STORAGE_SERVER_HOSTNAME store
 $DB_SERVER_IP            $DB_SERVER_HOSTNAME db-server
 $JUMP_SERVER_IP          $JUMP_SERVER_HOSTNAME jump puppet
+$METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
 
 yum install -y gcc-c++ make;

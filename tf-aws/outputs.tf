@@ -12,13 +12,13 @@ output "lb_server_public_ip" {
   value = aws_instance.todo-app-lb-server.*.public_ip
 }
 
-output "lb_server_public_eip" {
+/* output "lb_server_public_eip" {
   value = aws_eip.todo-app-lb-eip.public_ip
 }
 
 output "lb_server_public_eip_dns" {
   value = aws_eip.todo-app-lb-eip.public_dns
-}
+} */
 
 output "lb_server_public_dns" {
   value = aws_instance.todo-app-lb-server.*.public_dns
