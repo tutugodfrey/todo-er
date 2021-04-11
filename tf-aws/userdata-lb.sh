@@ -1,5 +1,31 @@
 #! /bin/bash
 
+METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
+METRIC_SERVER_IP=${METRIC_SERVER_IP}
+JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
+JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
+LB_SERVER_HOSTNAME=${LB_SERVER_HOSTNAME}
+LB_SERVER_IP=${LB_SERVER_IP}
+APP_SERVER_1_IP=${APP_SERVER_1_IP}
+APP_SERVER_2_IP=${APP_SERVER_2_IP}
+APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME} 
+APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME}
+STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
+STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
+
+# Renaming because nrpe requires this name for multiple scripts files
+# refer to ./deploy.sh script
+SERVER_IP=$LB_SERVER_IP
+
+yum update -y;
+# Add epel repository if not already install
+#ADD_EPEL_REPO
+
+# Install yum config manager if not present
+#YUM_CONFIG_MANAGER
+
 yum install git -y;
 yum install nginx -y;
 if [ $? -ne 0 ]; then
@@ -21,21 +47,6 @@ sed -i 's/8080/80/' .env; # will remove after modify after update content of .en
 # sed -i 's/APPPORT/80/' .env;
 npm run build;
 
-LB_SERVER_HOSTNAME=${LB_SERVER_HOSTNAME}
-LB_SERVER_IP=${LB_SERVER_IP}
-APP_SERVER_1_IP=${APP_SERVER_1_IP}
-APP_SERVER_2_IP=${APP_SERVER_2_IP}
-APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME} 
-APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME}
-JUMP_SERVER_IP=${JUMP_SERVER_IP}
-JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
-STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
-STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
-
-# Renaming because nrpe requires this name for multiple scripts files
-# refer to ./deploy.sh script
-SERVER_IP=$LB_SERVER_IP
-
 if [ $LB_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $LB_SERVER_HOSTNAME;
 fi;
@@ -46,7 +57,7 @@ $APP_SERVER_1_IP          $APP_SERVER_1_HOSTNAME
 $APP_SERVER_2_IP          $APP_SERVER_2_HOSTNAME
 $JUMP_SERVER_IP           $JUMP_SERVER_HOSTNAME jump puppet
 $STORAGE_SERVER_IP        $STORAGE_SERVER_HOSTNAME store
-
+$METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
 
 cat >> /etc/nginx/conf.d/app.conf <<EOF

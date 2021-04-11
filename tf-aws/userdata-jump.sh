@@ -1,51 +1,58 @@
 #! /bin/bash
 
-yum update
-yum install git -y
-
-# Install node.js
-yum install -y gcc-c++ make;
-curl -sL https://rpm.nodesource.com/setup_15.x | sudo -E bash -;
-yum install nodejs -y;
-echo "Version of node install is $(node --version)";
-
+METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
+METRIC_SERVER_IP=${METRIC_SERVER_IP}
+JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
+JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
+JUMP_SERVER_IP=${JUMP_SERVER_IP}
+JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 APP_SERVER_1_IP=${APP_SERVER_1_IP}
 APP_SERVER_2_IP=${APP_SERVER_2_IP}
 LB_SERVER_IP=${LB_SERVER_IP}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
-JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
-JUMP_SERVER_IP=${JUMP_SERVER_IP}
 DB_SERVER_IP=${DB_SERVER_IP}
 APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME}
 APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME}
 LB_SERVER_HOSTNAME=${LB_SERVER_HOSTNAME}
-JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
-JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
 ANSIBLE_PASSWD=${ANSIBLE_PASSWD}
 
 # Renaming because nrpe requires this name for multiple scripts files
 # refer to ./deploy.sh script
-SERVER_IP=$JUMP_SERVER_IP
+SERVER_IP=${JUMP_SERVER_IP}
 
-JUMP_SERVER_USER=${JUMP_SERVER_USER}
-JUMP_SERVER_USER_PW=${JUMP_SERVER_USER_PW}
-APP_SERVER_1_USER=${APP_SERVER_1_USER}
-APP_SERVER_1_USER_PW=${APP_SERVER_1_USER_PW}
-APP_SERVER_2_USER=${APP_SERVER_2_USER}
-APP_SERVER_2_USER_PW=${APP_SERVER_2_USER_PW}
-LB_SERVER_USER=${LB_SERVER_USER}
-LB_SERVER_USER_PW=${LB_SERVER_USER_PW}
-DB_SERVER_USER=${DB_SERVER_USER}
-DB_SERVER_USER_PW=${DB_SERVER_USER_PW}
-STORAGE_SERVER_USER=${STORAGE_SERVER_USER}
-STORAGE_SERVER_USER_PW=${STORAGE_SERVER_USER_PW}
-JENKINS_SERVER_USER=${JENKINS_SERVER_USER}
-JENKINS_SERVER_USER_PW=${JENKINS_SERVER_USER_PW}
+JUMP_SERVER_USERNAME=${JUMP_SERVER_USERNAME}
+JUMP_SERVER_PW=${JUMP_SERVER_PW}
+APP_SERVER_1_USERNAME=${APP_SERVER_1_USERNAME}
+APP_SERVER_1_PW=${APP_SERVER_1_PW}
+APP_SERVER_2_USERNAME=${APP_SERVER_2_USERNAME}
+APP_SERVER_2_PW=${APP_SERVER_2_PW}
+LB_SERVER_USERNAME=${LB_SERVER_USERNAME}
+LB_SERVER_PW=${LB_SERVER_PW}
+DB_SERVER_USERNAME=${DB_SERVER_USERNAME}
+DB_SERVER_PW=${DB_SERVER_PW}
+STORAGE_SERVER_USERNAME=${STORAGE_SERVER_USERNAME}
+STORAGE_SERVER_PW=${STORAGE_SERVER_PW}
+JENKINS_SERVER_USERNAME=${JENKINS_SERVER_USERNAME}
+JENKINS_SERVER_PW=${JENKINS_SERVER_PW}
+METRIC_SERVER_USERNAME=${METRIC_SERVER_USERNAME}
+METRIC_SERVER_PW=${METRIC_SERVER_PW}
+
+yum update -y;
+# Add epel repository if not already install
+#ADD_EPEL_REPO
+
+# Install yum config manager if not present
+#YUM_CONFIG_MANAGER
+
+# Install node.js
+# yum install -y gcc-c++ make;
+# curl -sL https://rpm.nodesource.com/setup_15.x | sudo -E bash -;
+# yum install nodejs -y;
+# echo "Version of node install is $(node --version)";
 
 cat >> /etc/hosts <<EOF
-
 $JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
 $APP_SERVER_1_IP            $APP_SERVER_1_HOSTNAME app1
 $APP_SERVER_2_IP            $APP_SERVER_2_HOSTNAME app2
@@ -53,6 +60,7 @@ $LB_SERVER_IP               $LB_SERVER_HOSTNAME lb
 $JENKINS_SERVER_IP          $JENKINS_SERVER_HOSTNAME jenkins
 $STORAGE_SERVER_IP          $STORAGE_SERVER_HOSTNAME store
 $DB_SERVER_IP               $DB_SERVER_HOSTNAME db
+$METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
 
 if [ $JUMP_SERVER_HOSTNAME ]; then 
@@ -70,7 +78,7 @@ puppet config set dns_alt_names "puppet" --section main;
 puppet config set server 'puppet' --section main;
 
 # Change the default memory limit required
-sed -i 's|JAVA_ARGS="-Xms2g -Xmx2g -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"|JAVA_ARGS="-Xms500m -Xmx500m -Djruby.logger.class=com.puppetlabs.jruby_utils.jruby.Slf4jLogger"|' /etc/sysconfig/puppetserver
+sed -i 's/-Xms2g -Xmx2g/-Xms450m -Xmx450m/' /etc/sysconfig/puppetserver
 
 cat > /etc/puppetlabs/puppet/autosign.conf <<EOF
 $JUMP_SERVER_HOSTNAME
@@ -80,6 +88,7 @@ $LB_SERVER_HOSTNAME
 $JENKINS_SERVER_HOSTNAME
 $STORAGE_SERVER_HOSTNAME
 $DB_SERVER_HOSTNAME
+$METRIC_SERVER_HOSTNAME
 EOF
 puppet agent -t;
 systemctl restart puppet;
@@ -87,9 +96,6 @@ systemctl enable --now puppetserver;
 
 
 ## Install and configure Ansible
-amazon-linux-extras install epel -y;
-yum-config-manager enable epel
-yum install epel-release -y;
 yum install ansible -y;
 useradd -G wheel ansible -m;
 
@@ -122,7 +128,7 @@ EOF
 
 cat > createfile.pp <<EOF
 class createfile {
-  file { '/etc/testfile.txt':
+  file { '/tmp/testfile.txt':
      ensure => present,
      content => "This is a test file",
      owner => ansible,
@@ -165,7 +171,6 @@ become_method = sudo
 become_user = root
 become_ask_pass = False
 EOF
-
 chown ansible:ansible /home/ansible/{ansible.cfg,inventory};
 
 ## Test the ansible configuration
@@ -192,84 +197,99 @@ cat > create-user.yml <<EOF
 - name: Jump Server
   hosts: jump
   become: yes
-  - tasks:
+  tasks:
     - name: Create Jump server user
       user:
-        name: ${JUMP_SERVER_USER}
-        password: ${JUMP_SERVER_USER_PW}
+        name: ${JUMP_SERVER_USERNAME}
+        password: ${JUMP_SERVER_PW}
         groups:
         - wheel
         append: yes
 - name: App Server 1
   hosts: app1
   become: yes
-  - tasks:
+  tasks:
     - name: Create App server 1 user
       user:
-        name: ${APP_SERVER_1_USER}
-        password: ${APP_SERVER_1_USER_PW}
+        name: ${APP_SERVER_1_USERNAME}
+        password: ${APP_SERVER_1_PW}
         groups:
         - wheel
         append: yes
 - name: App Server 2
   hosts: app2
   become: yes
-  - tasks:
+  tasks:
     - name: Create App server 2 user
       user:
-        name: ${APP_SERVER_2_USER}
-        password: ${APP_SERVER_2_USER_PW}
+        name: ${APP_SERVER_2_USERNAME}
+        password: ${APP_SERVER_2_PW}
         groups:
         - wheel
         append: yes
 - name: LB Server
   hosts: lb
   become: yes
-  - tasks:
+  tasks:
     - name: Create LB server user
       user:
-        name: ${LB_SERVER_USER}
-        password: ${LB_SERVER_USER_PW}
+        name: ${LB_SERVER_USERNAME}
+        password: ${LB_SERVER_PW}
         groups:
         - wheel
         append: yes
 - name: DB Server
   hosts: db
   become: yes
-  - tasks:
+  tasks:
     - name: Create DB Server user
       user:
-        name: ${DB_SERVER_USER}
-        password: ${DB_SERVER_USER_PW}
+        name: ${DB_SERVER_USERNAME}
+        password: ${DB_SERVER_PW}
         groups:
         - wheel
         append: yes
 - name: Create Users
   hosts: store
   become: yes
-  - tasks:
+  tasks:
     - name: Create storage server user
       user:
-        name: ${STORAGE_SERVER_USER}
-        password: ${STORAGE_SERVER_USER_PW}
+        name: ${STORAGE_SERVER_USERNAME}
+        password: ${STORAGE_SERVER_PW}
         groups:
         - wheel
         append: yes
 - name: Jenkins Server
   hosts: jenkins
   become: yes
-  - tasks
+  tasks:
     - name: Create Jenkins user
       user:
-        name: ${JENKINS_SERVER_USER}
-        password: ${JENKINS_SERVER_USER_PW}
+        name: ${JENKINS_SERVER_USERNAME}
+        password: ${JENKINS_SERVER_PW}
+        groups:
+        - wheel
+        append: yes
+- name: Metric Server
+  hosts: metrics
+  become: yes
+  tasks:
+    - name: Create Metric User
+      user:
+        name: ${METRIC_SERVER_USERNAME}
+        password: ${METRIC_SERVER_PW}
         groups:
         - wheel
         append: yes
 EOF
 ansible all -i inventory -m shell -a 'whoami' &2> /etc/ansible_answer.txt;
+chown ansible:ansible {gather-facts,create-user}.yml;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
+
+# Install and configure Nagios NRPE plugin
+#NRPE
 
 ## Add configuration for prometheus node exporter
 #NODEEXPORTER
@@ -295,3 +315,5 @@ systemctl start node_exporter;
 
 ## Install and configure Zabbix agent
 #ZABBIXAGENT
+
+yum install git -y;

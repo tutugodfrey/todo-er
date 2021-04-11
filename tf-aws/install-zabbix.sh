@@ -1,5 +1,14 @@
 #! /bin/bash
 
+ls /etc/yum.repos.d/ | grep epel;
+if [ $? -ne 0 ]; then
+ amazon-linux-extras install epel -y;
+fi
+
+# ls /etc/yum.repos.d/ | grep epel; if [ $? -ne 0 ]; then  amazon-linux-extras install epel -y;  fi
+
+yum-config-manager > /dev/null; if [ $? -ne 0 ]; then yum install yum-utils -y; fi;
+
 ## Install zabbix
 yum -y install httpd;
 systemctl enable --now httpd;
@@ -10,7 +19,7 @@ yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm -y;
 yum install yum-utils -y;
 yum-config-manager --disable remi-php54;
 yum-config-manager --enable remi-php72;
-yum install php php-pear php-cgi php-common php-mbstring php-snmp php-gd php-pecl-mysql php-xml php-mysql php-gettext php-bcmath -y;
+yum --skip-broken install php php-pear php-cgi php-common php-mbstring php-snmp php-gd php-pecl-mysql php-xml php-mysql php-gettext php-bcmath -y;
 sed -i '/;date.timezone =/a date.timezone = UTC' /etc/php.ini;
 yum --enablerepo=remi install mariadb-server -y;
 systemctl start mariadb.service;
