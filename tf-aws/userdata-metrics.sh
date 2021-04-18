@@ -141,6 +141,14 @@ define host {
   address             $DB_SERVER_IP
   # contact_groups admins
 }
+
+define host {
+  use                 manage-hosts
+  host_name           $JENKINS§_SERVER_HOSTNAME
+  alias               $JENKINS§_SERVER_HOSTNAME
+  address             $JENKINS§_SERVER_IP
+  # contact_groups admins
+}
 EOF
 
 cat > hostgroups.cfg <<EOF
@@ -272,6 +280,10 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ["$STORAGE_SERVER_IP:9100"]
+  - job_name: 'Storage Server'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["$JENKINS_SERVER_IP:9100"]
 EOF
 
 chown prometheus:prometheus /etc/prometheus/prometheus.yml;

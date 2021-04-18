@@ -17,3 +17,12 @@ tf-aws/terraform.tfstate
 tf-aws/.terraform.lock.hcl
 tf-aws/.terraform
 tf-aws/envfile
+
+tf-aws/devars.tfvars-e
+tf-aws/userdata-db.sh-e
+tf-aws/userdata-jenkins.sh-e
+tf-aws/userdata-jump.sh-e
+tf-aws/userdata-lb.sh-e
+tf-aws/userdata-metrics.sh-e
+tf-aws/userdata-storage.sh-e
+tf-aws/userdata.sh-e
