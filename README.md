@@ -43,6 +43,14 @@ Note the API_URL should be the base url that frontend app will run on. if your a
 
 - API_URL=http://localhost:3005/api  --- change the port to your desired port and make the API_URL available in our .env file
 
+### Build the frontend image
+
+- `docker build -t tutug/todoapp-fd:latest -f dockerfile-frontend .`
+
+### Expose the frontend app
+
+- `docker run -d --name todofrontend -p 8084:80 tutug/todoapp-fd`
+
 #### Using Jenkin build
 - Add JWT_SECRET key  and value pair to your jenkins environment variables. this will be used as --build-arg for building docker images
 
