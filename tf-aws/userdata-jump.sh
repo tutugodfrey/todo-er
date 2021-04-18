@@ -90,10 +90,9 @@ $STORAGE_SERVER_HOSTNAME
 $DB_SERVER_HOSTNAME
 $METRIC_SERVER_HOSTNAME
 EOF
-puppet agent -t;
 systemctl restart puppet;
 systemctl enable --now puppetserver;
-
+puppet agent -t;
 
 ## Install and configure Ansible
 yum install ansible -y;
@@ -111,9 +110,6 @@ chmod 700 /home/ansible/.ssh;
 ssh-keygen -t rsa -b 2048 -f /home/ansible/.ssh/id_rsa -C ansible;
 cp home/ansible/.ssh/id_rsa* /etc/;
 chown ansible:ansible /home/ansible/.ssh/id_rsa*;
-# cat 'eval $(ssh-agent)' >> /home/ansible/.bashrc;
-# cat 'ssh-add /home/ansible/.ssh/id_rsa' >> /home/ansible/.bashrc;
-# source /home/ansible/.bashrc;
 
 # Use puppet to copy ansible ssh key to the agent server
 cd /etc/puppetlabs/code/environments/production/manifests;
@@ -152,6 +148,7 @@ lb
 db
 jenkins
 store
+metrics
 
 [apps]
 app1
@@ -205,6 +202,7 @@ cat > create-user.yml <<EOF
         groups:
         - wheel
         append: yes
+        ignore_errors: true
 - name: App Server 1
   hosts: app1
   become: yes

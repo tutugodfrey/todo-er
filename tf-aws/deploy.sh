@@ -53,6 +53,7 @@ yum install bind-utils -y; \
 echo export PATH=/opt/puppetlabs/bin/:$PATH >> /root/.bash_profile; \
 source /root/.bash_profile; \
 puppet config set server "puppet" --section main; \
+puppet config set runinterval 10 --section main; \
 puppet resource service puppet ensure=running enable=true; \
 systemctl enable --now puppet;
 EOF

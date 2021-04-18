@@ -89,7 +89,7 @@ resource "aws_internet_gateway" "todo-app-igw" {
 resource "aws_route" "todo-app-igw-route" {
   route_table_id = aws_route_table.todo-app-public-route-table.id
   gateway_id = aws_internet_gateway.todo-app-igw.id 
-  destination_cidr_block = [var.public_cidr]
+  destination_cidr_block = var.public_cidr
 }
 
 # ### CREATE A EC2 NAT GATEWAY INSTANCE
@@ -130,7 +130,7 @@ resource "aws_nat_gateway" "todo-app-nat-gateway" {
 resource "aws_route" "todo-app-nat-route" {
   route_table_id = aws_route_table.todo-app-private-route-table.id
   nat_gateway_id = aws_nat_gateway.todo-app-nat-gateway.id 
-  destination_cidr_block = [var.public_cidr]
+  destination_cidr_block = var.public_cidr
 }
 
 ### MANAGE SECURITY GROUPS
