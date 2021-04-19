@@ -120,9 +120,9 @@ function push_image() {
     echo "Please specify which image to push. Use -be for backend image and -fe for frontend image"
     return 1;
   fi
-  if [[ $1=='-be' ]]; then
+  if [[ $1 == '-be' ]]; then
     IMAGE_NAME=$IMAGE_NAME_BE
-  elif [[ $1=='-fe' ]]; then
+  elif [[ $1 == '-fe' ]]; then
     IMAGE_NAME=$IMAGE_NAME_FE
   fi
   command="docker push $IMAGE_NAME:latest";

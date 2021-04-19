@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-db-deployment
+  labels:
+    run: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: db
+  template:
+    metadata:
+      labels:
+        run: db
+    spec:
+      containers:
+      - name: todoapp-db-container
+        image: postgres:latest
+        env:
+          - name: POSTGRES_PASSWORD
+            value: postgres
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_HOST_AUTH_METHOD
+            value: trust
+        resources:
+        #  requests:
+         #   cpu: 500m
+          #  memory: 2Gi
+          limits:
+           cpu: 500m
+           memory: 2Gi
+        ports:
+        - name: db-port
+          containerPort: 5432
+        volumeMounts:
+        - name: todoapp-db-volume
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: todoapp-db-volume
+        emptyDir: {}

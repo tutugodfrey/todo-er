@@ -1,0 +1,6 @@
+# Use this sample curl command to test the deployment on the backed
+# ensure IP and TOKEN are in environment variable or add them to the command manually
+
+curl -X POST -H "Content-Type: application/json" -d '{"username": "laura", "password": "laurapassword", "confirmPassword": "myownpassword", "name": "Laura John", "email": "laura@gmail.com"}' http://$IP:3005/api/users/signup
+curl -X POST -H Content-Type: application/json -d '{"username": "ryan", "password": "ryanpassword", "confirmPassword": "myownpassword", "name": "Ryan Brown", "email": "ryan@gmail.com"}' http://$IP:3005/api/users/signup
+curl -H Content-Type: application/json, -H token: $TOKEN http://$IP:3005/api/user

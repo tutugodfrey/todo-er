@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todoapp-fe-service
+  labels:
+    app: todoapp-fe
+spec:
+  selector:
+    app: todoapp-fe
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
