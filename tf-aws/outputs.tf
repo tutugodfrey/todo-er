@@ -12,13 +12,13 @@ output "lb_server_public_ip" {
   value = aws_instance.todo-app-lb-server.*.public_ip
 }
 
-/* output "lb_server_public_eip" {
-  value = aws_eip.todo-app-lb-eip.public_ip
-}
+#output "lb_server_public_eip" {
+#  value = aws_eip.todo-app-lb-eip.public_ip
+#}
 
-output "lb_server_public_eip_dns" {
-  value = aws_eip.todo-app-lb-eip.public_dns
-} */
+#output "lb_server_public_eip_dns" {
+#  value = aws_eip.todo-app-lb-eip.public_dns
+#} 
 
 output "lb_server_public_dns" {
   value = aws_instance.todo-app-lb-server.*.public_dns
@@ -46,6 +46,14 @@ output "app1_server_private_ip" {
 
 output "app2_server_private_ip" {
   value = aws_instance.todo-app-server-2.*.private_ip
+}
+
+output "nat_instance_private_ip" {
+  value = aws_instance.todo-app-nat-instance.*.private_ip
+}
+
+output "nat_instance_public_ip" {
+  value = aws_instance.todo-app-nat-instance.*.public_ip
 }
 
 # Running output terraform command

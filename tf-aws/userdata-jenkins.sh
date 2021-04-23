@@ -29,6 +29,8 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
 if [ $JENKINS_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $JENKINS_SERVER_HOSTNAME;
 fi;

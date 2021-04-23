@@ -75,10 +75,6 @@ chown ansible:ansible /home/ansible/.ssh/authorized_keys;
 EOF
 
 cat > nrpe <<EOF
-fallocate -l 512M /swapfile; \
-chmod 600 /swapfile; \
-mkswap /swapfile; \
-swapon /swapfile; \
 yum install -y wget gcc glibc glibc-common openssl openssl-devel make gettext automake autoconf net-snmp net-snmp-utils epel-release; \
 yum install -y perl-Net-SNMP; \
 cd /tmp/; \
@@ -124,12 +120,14 @@ sed -i "s/Hostname=Zabbix server/Hostname=master/" /etc/zabbix/zabbix_agentd.con
 systemctl enable --now zabbix-agent;
 EOF
 
+ADD_SWAP_FILE='fallocate -l 512M /swapfile; chmod 600 /swapfile; mkswap /swapfile; swapon /swapfile;'
 ADD_EPEL_REPO='ls \/etc\/yum.repos.d\/ | grep epel; if [ $? -ne 0 ]; then  amazon-linux-extras install epel -y;  fi;'
 YUM_CONFIG_MANAGER='yum-config-manager > \/dev\/null; if [ $? -ne 0 ]; then yum install yum-utils -y; fi; yum-config-manager enable epel;'
 PUPPET_WAIT_1='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Wait for puppet CA Signing; sleep 3; ((counter++)); done;'
 PUPPET_WAIT_2='counter=0; until puppet agent -t || [ $counter -gt 15 ] ; do echo Attempting pull for ansible ssh key; sleep 3; ((counter++)); done;'
 
 # Inject the setup script to the various userdata scripts
+sed -i -e "s|#ADD_SWAP_FILE|&\n$(echo $ADD_SWAP_FILE)|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e "s/#ADD_EPEL_REPO/&\n$(echo $ADD_EPEL_REPO)/" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e "s/#YUM_CONFIG_MANAGER/&\n$(echo $YUM_CONFIG_MANAGER)/" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e "s|#PUPPET_CONFIG|$(cat puppet)|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
@@ -175,6 +173,7 @@ sed -i -e "s/${ZABBIX_DB}/ZABBIX_DB/" devars.tfvars
 sed -i -e "s/${ZABBIX_PS}/ZABBIX_PS/" devars.tfvars
 
 # Reverse the content of the userdata scripts to their original state
+sed -i -e '/#ADD_SWAP_FILE/{n;d;}' {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e '/#ADD_EPEL_REPO/{n;d;}' {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e '/#YUM_CONFIG_MANAGER/{n;d;}' {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh
 sed -i -e "s|$(cat puppet)|#PUPPET_CONFIG|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump,userdata-metrics}.sh

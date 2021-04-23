@@ -26,6 +26,27 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
+if [ $LB_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $LB_SERVER_HOSTNAME;
+fi;
+
+cat >> /etc/hosts <<EOF
+$APP_SERVER_1_IP          $APP_SERVER_1_HOSTNAME
+$APP_SERVER_2_IP          $APP_SERVER_2_HOSTNAME
+$JUMP_SERVER_IP           $JUMP_SERVER_HOSTNAME jump puppet
+$STORAGE_SERVER_IP        $STORAGE_SERVER_HOSTNAME store
+$METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
+EOF
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
+
 yum install git -y;
 yum install nginx -y;
 if [ $? -ne 0 ]; then
@@ -46,19 +67,6 @@ sed -i "s/IP/$IP_ADDRESS/" .env;
 sed -i 's/8080/80/' .env; # will remove after modify after update content of .env file
 # sed -i 's/APPPORT/80/' .env;
 npm run build;
-
-if [ $LB_SERVER_HOSTNAME ]; then
-  hostnamectl set-hostname $LB_SERVER_HOSTNAME;
-fi;
-
-cat >> /etc/hosts <<EOF
-
-$APP_SERVER_1_IP          $APP_SERVER_1_HOSTNAME
-$APP_SERVER_2_IP          $APP_SERVER_2_HOSTNAME
-$JUMP_SERVER_IP           $JUMP_SERVER_HOSTNAME jump puppet
-$STORAGE_SERVER_IP        $STORAGE_SERVER_HOSTNAME store
-$METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
-EOF
 
 cat >> /etc/nginx/conf.d/app.conf <<EOF
 server {
@@ -97,13 +105,6 @@ echo "store:/data /data   nfs _netdev 0 0" >> /etc/fstab
 until mount -a; do echo "waiting for nfs mount to succeed"; done;
 
 # ln -s /data/* /usr/share/nginx/html/;
-
-# ./deploy script will replace the line below with puppet configuration during run
-# and reverse it after terraform has finished deploying
-#PUPPET_CONFIG
-
-# Wait for puppet server to sign CA
-#PUPPET_WAIT_1
 
 # Add configuration for Ansible user
 #ANSIBLE_CONFIG

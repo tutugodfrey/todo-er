@@ -25,6 +25,8 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
 if [ DB_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $DB_SERVER_HOSTNAME
 fi;

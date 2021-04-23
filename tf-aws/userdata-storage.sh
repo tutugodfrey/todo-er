@@ -31,6 +31,8 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
 if [ $STORAGE_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $STORAGE_SERVER_HOSTNAME
 fi
@@ -45,6 +47,13 @@ $JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
 $DB_SERVER_IP               $DB_SERVER_HOSTNAME db
 $METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
 
 yum install git -y;
 yum install nginx -y;
@@ -87,13 +96,6 @@ mount -a
 exportfs -av
 
 cd /;
-
-# ./deploy script will replace the line below with puppet configuration during run
-# and reverse it after terraform has finished deploying
-#PUPPET_CONFIG
-
-# Wait for puppet server to sign CA
-#PUPPET_WAIT_1
 
 # Add configuration for Ansible user
 #ANSIBLE_CONFIG
