@@ -28,15 +28,11 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
 if [ $APP_SERVER_HOSTNAME ]; then
   hostnamectl set-hostname $APP_SERVER_HOSTNAME;
 fi;
-
-yum install git -y;
-yum install nginx -y;
-if [ $? -ne 0 ]; then
-  amazon-linux-extras install nginx1 -y;
-fi
 
 cat >> /etc/hosts <<EOF
 $STORAGE_SERVER_IP       $STORAGE_SERVER_HOSTNAME store
@@ -44,6 +40,19 @@ $DB_SERVER_IP            $DB_SERVER_HOSTNAME db-server
 $JUMP_SERVER_IP          $JUMP_SERVER_HOSTNAME jump puppet
 $METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
+
+# ./deploy script will replace the line below with puppet configuration during run
+# and reverse it after terraform has finished deploying
+#PUPPET_CONFIG
+
+# Wait for puppet server to sign CA
+#PUPPET_WAIT_1
+
+yum install git -y;
+yum install nginx -y;
+if [ $? -ne 0 ]; then
+  amazon-linux-extras install nginx1 -y;
+fi
 
 yum install -y gcc-c++ make;
 curl -sL https://rpm.nodesource.com/setup_15.x | sudo -E bash -;
@@ -116,13 +125,6 @@ systemctl enable todoapp.service
 systemctl start todoapp.service
 systemctl enable todoapp-watcher.{path,service}
 systemctl start todoapp-watcher.{path,service}
-
-# ./deploy script will replace the line below with puppet configuration during run
-# and reverse it after terraform has finished deploying
-#PUPPET_CONFIG
-
-# Wait for puppet server to sign CA
-#PUPPET_WAIT_1
 
 # Add configuration for Ansible user
 #ANSIBLE_CONFIG

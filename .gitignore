@@ -26,3 +26,4 @@ tf-aws/userdata-lb.sh-e
 tf-aws/userdata-metrics.sh-e
 tf-aws/userdata-storage.sh-e
 tf-aws/userdata.sh-e
+docker-helper.sh-e

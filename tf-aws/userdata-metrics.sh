@@ -26,13 +26,20 @@ ZABBIX_PS=${ZABBIX_PS}
 # refer to ./deploy.sh script
 SERVER_IP=$METRIC_SERVER_IP
 
+yum update -y;
 # Add epel repository if not already install
 #ADD_EPEL_REPO
 
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
-yum update -y;
+# Add swap file
+#ADD_SWAP_FILE
+
+
+if [ $METRIC_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $METRIC_SERVER_HOSTNAME;
+fi;
 
 cat >> /etc/hosts <<EOF
 $APP_SERVER_1_IP            $APP_SERVER_1_HOSTNAME app1
@@ -44,10 +51,6 @@ $JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
 $DB_SERVER_IP               $DB_SERVER_HOSTNAME db
 $METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
-
-if [ $METRIC_SERVER_HOSTNAME ]; then 
-  hostnamectl set-hostname $METRIC_SERVER_HOSTNAME;
-fi;
 
 # ./deploy script will replace the line below with puppet configuration during run
 # and reverse it after terraform has finished deploying
@@ -144,10 +147,17 @@ define host {
 
 define host {
   use                 manage-hosts
-  host_name           $JENKINS§_SERVER_HOSTNAME
-  alias               $JENKINS§_SERVER_HOSTNAME
-  address             $JENKINS§_SERVER_IP
+  host_name           $JENKINS_SERVER_HOSTNAME
+  alias               $JENKINS_SERVER_HOSTNAME
+  address             $JENKINS_SERVER_IP
   # contact_groups admins
+}
+
+define host {
+  use                 manage-hosts
+  host_name           $JUMP_SERVER_HOSTNAME
+  alias               $JUMP_SERVER_HOSTNAME
+  address             $JUMP_SERVER_IP
 }
 EOF
 
@@ -255,7 +265,7 @@ scrape_configs:
   - job_name: 'prometheus_master'
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
   - job_name: 'Jump Server'
     scrape_interval: 5s
     static_configs:
@@ -280,7 +290,7 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ["$STORAGE_SERVER_IP:9100"]
-  - job_name: 'Storage Server'
+  - job_name: 'jenkins Server'
     scrape_interval: 5s
     static_configs:
       - targets: ["$JENKINS_SERVER_IP:9100"]

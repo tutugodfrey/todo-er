@@ -88,52 +88,38 @@ resource "aws_internet_gateway" "todo-app-igw" {
 
 resource "aws_route" "todo-app-igw-route" {
   route_table_id = aws_route_table.todo-app-public-route-table.id
-  gateway_id = aws_internet_gateway.todo-app-igw.id 
+  gateway_id = aws_internet_gateway.todo-app-igw.id
   destination_cidr_block = var.public_cidr
 }
 
-# ### CREATE A EC2 NAT GATEWAY INSTANCE
-# resource "aws_eip" "todo-app-nat-eip" {
-#   vpc = true
-#   instance = aws_instance.todo-app-nat-instance.id
-
-#   tags = {
-#     Name = "todo-app-nat-instance-eip"
-#   }
-# }
-
-# resource "aws_instance" "todo-app-nat-instance" {
-#   ami = var.app_server_ami_id
-#   instance_type = var.ec2_instance_type
-#   subnet_id = aws_subnet.todo-app-public-subnet-b.id
-#   tags = {
-#     Name = "Todo App Nat Instance"
-#   }
-# }
-
-### CREATE NAT GATEWAY (AWS MANAGE)
-resource "aws_eip" "todo-app-nat-gateway-eip" {
-  tags = {
-    Name = "todo-app-nat-gateway-eip"
-  }
-}
-
-resource "aws_nat_gateway" "todo-app-nat-gateway" {
-  allocation_id = aws_eip.todo-app-nat-gateway-eip.id
-  subnet_id = aws_subnet.todo-app-public-subnet-a.id
-
-  tags = {
-    Name = "todo-app-nat-gateway"
-  }
-}
-
-resource "aws_route" "todo-app-nat-route" {
+resource "aws_route" "todo-app-nat-instance-route" {
   route_table_id = aws_route_table.todo-app-private-route-table.id
-  nat_gateway_id = aws_nat_gateway.todo-app-nat-gateway.id 
+  instance_id = aws_instance.todo-app-nat-instance.id
   destination_cidr_block = var.public_cidr
 }
 
 ### MANAGE SECURITY GROUPS
+# Nat instance security group
+resource "aws_security_group" "todo-app-nat-instance-sg" {
+  name = "todo-app-nat-instance-sg"
+  vpc_id = aws_vpc.todo-app-vpc.id
+  ingress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = [var.private_subnet_a_cidr, var.private_subnet_b_cidr]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    cidr_blocks = [var.public_cidr]
+    protocol = "-1"
+  }
+  tags = {
+    Name = "todo-app-nat-instance-sg"
+  }
+}
+
 resource "aws_security_group" "todo-app-web-access-sg" {
   name = "todo-app-web-access-sg"
   vpc_id = aws_vpc.todo-app-vpc.id
@@ -321,6 +307,59 @@ resource "aws_security_group_rule" "allow-nagios-nrpe-port-5666" {
   security_group_id = aws_security_group.todo-app-metric-server-sg.id
 }
 
+## CREATE A EC2 NAT GATEWAY INSTANCE
+resource "aws_instance" "todo-app-nat-instance" {
+  ami = var.app_server_ami_id
+  key_name = var.ec2_keypair
+  instance_type = var.ec2_instance_type
+  subnet_id = aws_subnet.todo-app-public-subnet-b.id
+  associate_public_ip_address = true
+  source_dest_check = false
+  security_groups = [
+    aws_security_group.todo-app-nat-instance-sg.id,
+    aws_security_group.todo-app-external-ssh-sg.id
+  ]
+  user_data = <<EOF
+    #!/bin/bash
+    yum -y update
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    echo 0 > /proc/sys/net/ipv4/conf/eth0/send_redirects
+    /sbin/iptables -t nat -A POSTROUTING -o eth0 -s 0.0.0.0/0 -j MASQUERADE
+    /sbin/iptables-save > /etc/sysconfig/iptables
+    mkdir -p /etc/sysctl.d/
+    cat <<END > /etc/sysctl.d/nat.conf
+    net.ipv4.ip_forward = 1
+    net.ipv4.conf.eth0.send_redirects = 0
+    END
+  EOF
+  tags = {
+    Name = "Todo App Nat Instance"
+  }
+}
+
+### CREATE NAT GATEWAY (AWS MANAGE)
+/* resource "aws_eip" "todo-app-nat-gateway-eip" {
+  tags = {
+    Name = "todo-app-nat-gateway-eip"
+  }
+}
+
+resource "aws_nat_gateway" "todo-app-nat-gateway" {
+  allocation_id = aws_eip.todo-app-nat-gateway-eip.id
+  subnet_id = aws_subnet.todo-app-public-subnet-a.id
+
+  tags = {
+    Name = "todo-app-nat-gateway"
+  }
+}
+
+resource "aws_route" "todo-app-nat-route" {
+  route_table_id = aws_route_table.todo-app-private-route-table.id
+  nat_gateway_id = aws_nat_gateway.todo-app-nat-gateway.id 
+  destination_cidr_block = var.public_cidr
+} */
+
+## SETUP APP SERVERS
 resource "aws_network_interface" "tod-app-server-1-eni" {
   subnet_id = aws_subnet.todo-app-private-subnet-a.id
   private_ips = [ var.app_server_1_private_ip ]
@@ -372,8 +411,7 @@ resource "aws_instance" "todo-app-server-1" {
   ]
   subnet_id = aws_subnet.todo-app-private-subnet-a.id
   user_data = data.template_file.user-data-app-server-1.rendered
-  associate_public_ip_address = true
-
+  associate_public_ip_address = false
   tags = {
     Name = "App server 1"
   }
@@ -429,7 +467,7 @@ resource "aws_instance" "todo-app-server-2" {
   ]
   subnet_id = aws_subnet.todo-app-private-subnet-b.id
   user_data = data.template_file.user-data-app-server-2.rendered
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   tags = {
     Name = "App Server 2"
   }
@@ -588,7 +626,7 @@ resource "aws_instance" "todo-app-jenkins-server" {
 #   skip_final_snapshot = true
 # }
 
-## SETUP A DATABASE SERVER WITH POSTGRESQL
+## SETUP A POSTGRESQL DATABASE SERVER WITH EC2 INSTANCE 
 resource "aws_network_interface" "todo-app-db-server-eni" {
   subnet_id = aws_subnet.todo-app-private-subnet-b.id
   private_ips = [var.db_server_private_ip]
@@ -629,7 +667,7 @@ resource "aws_instance" "todo-app-db-server" {
   instance_type = var.ec2_instance_type
   key_name = var.ec2_keypair
   subnet_id = aws_subnet.todo-app-private-subnet-b.id
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   user_data = data.template_file.db-server-template-file.rendered
   security_groups = [
     aws_security_group.todo-app-metric-server-sg.id,
@@ -695,7 +733,7 @@ resource "aws_instance" "todo-app-storage-server" {
     aws_security_group.todo-app-web-access-sg.id,
   ]
   user_data = data.template_file.storage-server-template-file.rendered
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   tags = {
     Name = "Storage Server"
   }

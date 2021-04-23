@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -46,11 +48,18 @@ yum update -y;
 # Install yum config manager if not present
 #YUM_CONFIG_MANAGER
 
+# Add swap file
+#ADD_SWAP_FILE
+
 # Install node.js
 # yum install -y gcc-c++ make;
 # curl -sL https://rpm.nodesource.com/setup_15.x | sudo -E bash -;
 # yum install nodejs -y;
 # echo "Version of node install is $(node --version)";
+
+if [ $JUMP_SERVER_HOSTNAME ]; then
+  hostnamectl set-hostname $JUMP_SERVER_HOSTNAME;
+fi;
 
 cat >> /etc/hosts <<EOF
 $JUMP_SERVER_IP             $JUMP_SERVER_HOSTNAME jump puppet
@@ -62,10 +71,6 @@ $STORAGE_SERVER_IP          $STORAGE_SERVER_HOSTNAME store
 $DB_SERVER_IP               $DB_SERVER_HOSTNAME db
 $METRIC_SERVER_IP           $METRIC_SERVER_HOSTNAME metrics
 EOF
-
-if [ $JUMP_SERVER_HOSTNAME ]; then 
-  hostnamectl set-hostname $JUMP_SERVER_HOSTNAME;
-fi;
 
 ## Install and configure puppet
 # ./deploy script will replace the line below with puppet configuration during run
@@ -94,6 +99,11 @@ systemctl restart puppet;
 systemctl enable --now puppetserver;
 puppet agent -t;
 
+# Track how much for puppet to have been install
+PUPPET_SETUP_COMPLETE=$(date +%s)
+DURATION=$(echo "$PUPPET_SETUP_COMPLETE - $START" | bc)
+echo $DURATION >> /tmp/duration.txt
+
 ## Install and configure Ansible
 yum install ansible -y;
 useradd -G wheel ansible -m;
@@ -114,15 +124,15 @@ chown ansible:ansible /home/ansible/.ssh/id_rsa*;
 # Use puppet to copy ansible ssh key to the agent server
 cd /etc/puppetlabs/code/environments/production/manifests;
 cat >> copysshkey.pp <<EOF
-class copy_ssh {
+class copy_ssh_key {
   file {'/home/ansible/.ssh/authorized_keys':
     content => 'ANSIBLE_SSH_KEY'
   }
 }
-include copy_ssh
+include copy_ssh_key
 EOF
 
-cat > createfile.pp <<EOF
+cat > puppet-test-file.pp <<EOF
 class createfile {
   file { '/tmp/testfile.txt':
      ensure => present,
@@ -138,7 +148,12 @@ EOF
 sed -i "s|ANSIBLE_SSH_KEY|$(cat /home/ansible/.ssh/id_rsa.pub)|" copysshkey.pp;
 
 # Execute puppet
+puppet apply puppet-test-file.pp
 puppet apply copysshkey.pp
+
+PUPPET_SETUP_APPLY=$(date +%s)
+DURATION=$(echo "$PUPPET_SETUP_APPLY - $START" | bc)
+echo PUPPET APPLY AT $DURATION >> /tmp/duration.txt
 
 # Create ansible inventory file
 cat >> /home/ansible/inventory <<EOF
@@ -281,7 +296,7 @@ cat > create-user.yml <<EOF
         - wheel
         append: yes
 EOF
-ansible all -i inventory -m shell -a 'whoami' &2> /etc/ansible_answer.txt;
+ansible all -i inventory -m shell -a 'whoami' &2> /tmp/ansible_answer.txt;
 chown ansible:ansible {gather-facts,create-user}.yml;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
@@ -315,3 +330,6 @@ systemctl start node_exporter;
 #ZABBIXAGENT
 
 yum install git -y;
+
+# Script execution end
+END=$(date +%s)
