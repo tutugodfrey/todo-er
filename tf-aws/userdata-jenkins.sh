@@ -23,6 +23,10 @@ ZABBIX_DB=${ZABBIX_DB}
 ZABBIX_PS=${ZABBIX_PS}
 
 yum update -y;
+SERVER_PRIVATE_IP=$(ip a | grep inet | awk -F' ' '/brd/ { print $2 }' | awk -F/ '{ print $1 }' | cut -d' ' -f 2);
+SERVER_PRIVATE_IP=$(echo $SERVER_PRIVATE_IP | cut -d' ' -f 2);
+echo $SERVER_PRIVATE_IP > /tmp/server-ip.txt;
+
 # Add epel repository if not already install
 #ADD_EPEL_REPO
 

@@ -15,11 +15,11 @@ APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
 
-# Renaming because nrpe requires this name for multiple scripts files
-# refer to ./deploy.sh script
-SERVER_IP=$LB_SERVER_IP
-
 yum update -y;
+SERVER_PRIVATE_IP=$(ip a | grep inet | awk -F' ' '/brd/ { print $2 }' | awk -F/ '{ print $1 }' | cut -d' ' -f 2);
+SERVER_PRIVATE_IP=$(echo $SERVER_PRIVATE_IP | cut -d' ' -f 2);
+echo $SERVER_PRIVATE_IP > /tmp/server-ip.txt;
+
 # Add epel repository if not already install
 #ADD_EPEL_REPO
 

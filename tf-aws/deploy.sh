@@ -3,7 +3,7 @@
 # This script will be used to execute the terraform deployment
 # To ensure the idempotent and keep the files the same
 # changes made during the execution of the script will be reversed 
-# after successful execution. For example when changing variables in devars.tfvars file.
+# after terraform execution. For example when changing variables in devars.tfvars file.
 
 # envfile should be prevent in the terraform directory
 # and should contain values for the listed below 
@@ -98,8 +98,8 @@ make; \
 make install; \
 systemctl restart nrpe; \
 sed -i 's/server_address=127.0.0.1/#server_address=127.0.0.1/' /usr/local/nagios/etc/nrpe.cfg; \
-sed -i "/#server_address=127.0.0.1/a server_address=\$SERVER_IP" /usr/local/nagios/etc/nrpe.cfg; \
-sed -i "s/allowed_hosts=127.0.0.1,::1/allowed_hosts=127.0.0.1,::1,\$SERVER_IP,\${METRIC_SERVER_IP}/" /usr/local/nagios/etc/nrpe.cfg; \
+sed -i "/#server_address=127.0.0.1/a server_address=\$SERVER_PRIVATE_IP" /usr/local/nagios/etc/nrpe.cfg; \
+sed -i "s/allowed_hosts=127.0.0.1,::1/allowed_hosts=127.0.0.1,::1,\$SERVER_PRIVATE_IP,\${METRIC_SERVER_IP}/" /usr/local/nagios/etc/nrpe.cfg; \
 sed -i 's/dont_blame_nrpe=0/dont_blame_nrpe=1/' /usr/local/nagios/etc/nrpe.cfg;
 EOF
 
@@ -114,8 +114,8 @@ EOF
 cat > zabbixagent <<EOF
 rpm -ivh https://repo.zabbix.com/zabbix/4.0/rhel/7/x86_64/zabbix-release-4.0-1.el7.noarch.rpm; \
 yum install zabbix-agent -y; \
-sed -i "s/ServerActive=127.0.0.1/ServerActive=\$SERVER_IP/" /etc/zabbix/zabbix_agentd.conf; \
-sed -i "s/Server=127.0.0.1/Server=\$SERVER_IP/" /etc/zabbix/zabbix_agentd.conf; \
+sed -i "s/ServerActive=127.0.0.1/ServerActive=\$SERVER_PRIVATE_IP/" /etc/zabbix/zabbix_agentd.conf; \
+sed -i "s/Server=127.0.0.1/Server=\$SERVER_PRIVATE_IP/" /etc/zabbix/zabbix_agentd.conf; \
 sed -i "s/Hostname=Zabbix server/Hostname=master/" /etc/zabbix/zabbix_agentd.conf; \
 systemctl enable --now zabbix-agent;
 EOF

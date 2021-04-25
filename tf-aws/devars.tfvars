@@ -3,6 +3,8 @@ region  = "us-west-2"
 
 ec2_instance_type = "t2.micro"
 ec2_keypair = "aws2-oregon-key"
+
+# amazon linux 2 ami id
 app_server_ami_id = "ami-0e999cbd62129e3b1"
 jenkins_server_ami_id = "ami-0e999cbd62129e3b1"
 
@@ -15,7 +17,7 @@ metric_server_private_ip = "10.0.2.8"
 jenkins_server_private_ip = "10.0.2.10"
 
 public_subnet_b_cidr = "10.0.10.0/24"
-jump_server_private_ip = "10.0.10.7"
+jump_server_private_ip = "10.0.10.8"
 lb_server_private_ip = "10.0.10.11"
 
 private_subnet_a_cidr = "10.0.5.0/24"

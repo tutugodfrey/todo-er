@@ -6,22 +6,30 @@ JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
 JENKINS_SERVER_IP=${JENKINS_SERVER_IP}
 JUMP_SERVER_IP=${JUMP_SERVER_IP}
 JUMP_SERVER_HOSTNAME=${JUMP_SERVER_HOSTNAME}
-APP_SERVER_HOSTNAME=${APP_SERVER_HOSTNAME}
-APP_SERVER_IP=${APP_SERVER_IP}
 STORAGE_SERVER_IP=${STORAGE_SERVER_IP}
 STORAGE_SERVER_HOSTNAME=${STORAGE_SERVER_HOSTNAME}
 DB_SERVER_HOSTNAME=${DB_SERVER_HOSTNAME}
 DB_SERVER_IP=${DB_SERVER_IP}
+APP_SERVER_1_IP=${APP_SERVER_1_IP}
+APP_SERVER_1_HOSTNAME=${APP_SERVER_1_HOSTNAME}
+APP_SERVER_2_IP=${APP_SERVER_2_IP}
+APP_SERVER_2_HOSTNAME=${APP_SERVER_2_HOSTNAME} 
 DB_NAME=${DB_NAME}
 DB_USER_NAME=${DB_USER_NAME}
 DB_USER_PASS=${DB_USER_PASS}
 DB_PORT=${DB_PORT}
 
-# Renaming because nrpe requires this name for multiple scripts files
-# refer to ./deploy.sh script
-SERVER_IP=$APP_SERVER_IP
-
 yum update -y;
+SERVER_PRIVATE_IP=$(ip a | grep inet | awk -F' ' '/brd/ { print $2 }' | awk -F/ '{ print $1 }');
+SERVER_PRIVATE_IP=$(echo $SERVER_PRIVATE_IP | cut -d' ' -f 2);
+echo $SERVER_PRIVATE_IP > /tmp/server-ip.txt;
+
+if [ $SERVER_PRIVATE_IP == $APP_SERVER_1_IP  ]; then
+  hostnamectl set-hostname $APP_SERVER_1_HOSTNAME;
+elif [ $SERVER_PRIVATE_IP == $APP_SERVER_2_IP  ]; then
+  hostnamectl set-hostname $APP_SERVER_2_HOSTNAME;
+fi;
+
 # Add epel repository if not already install
 #ADD_EPEL_REPO
 
@@ -30,9 +38,6 @@ yum update -y;
 
 # Add swap file
 #ADD_SWAP_FILE
-if [ $APP_SERVER_HOSTNAME ]; then
-  hostnamectl set-hostname $APP_SERVER_HOSTNAME;
-fi;
 
 cat >> /etc/hosts <<EOF
 $STORAGE_SERVER_IP       $STORAGE_SERVER_HOSTNAME store
