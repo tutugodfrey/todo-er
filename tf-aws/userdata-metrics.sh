@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -404,3 +406,8 @@ sed -i 's|PidFile=/var/run/zabbix/zabbix_server.pid|PidFile=/run/zabbix/zabbix_s
 systemctl restart zabbix-server;
 systemctl enable --now zabbix-agent;
 systemctl restart httpd;
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt

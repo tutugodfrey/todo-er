@@ -185,10 +185,8 @@ become_ask_pass = False
 EOF
 chown ansible:ansible /home/ansible/{ansible.cfg,inventory};
 
-## Test the ansible configuration
-sudo -i -u ansible
-cd /home/ansible;
-cat > gather-facts.yml <<EOF
+
+cat > /home/ansible/gather-facts.yml <<EOF
 - name: Gather facts
   hosts: all
   become: true
@@ -205,7 +203,7 @@ cat > gather-facts.yml <<EOF
 EOF
 
 # Use ansible to create dedicated users for all our servers
-cat > create-user.yml <<EOF
+cat > /home/ansible/create-user.yml <<EOF
 - name: Jump Server
   hosts: jump
   become: yes
@@ -296,10 +294,21 @@ cat > create-user.yml <<EOF
         - wheel
         append: yes
 EOF
-ansible all -i inventory -m shell -a 'whoami' &2> /tmp/ansible_answer.txt;
-chown ansible:ansible {gather-facts,create-user}.yml;
+
+cat > /home/ansible/ansible_script.sh <<EOF
+#! /bin/bash
+counter=0;
+until ansible all -i inventory -m shell -a 'whoami' > ansible_answer.txt || [ $counter -gt 20 ]; do
+  echo Waiting for managed servers to be ready; sleep 3;
+  ((counter++));
+  echo $counter;
+done;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
+EOF
+chown ansible:ansible /home/ansible/{gather-facts,create-user}.yml;
+chown ansible:ansible /home/ansible/ansible_script.sh;
+chmod +x /home/ansible/ansible_script.sh;
 
 # Install and configure Nagios NRPE plugin
 #NRPE
@@ -331,5 +340,10 @@ systemctl start node_exporter;
 
 yum install git -y;
 
+## Test the ansible configuration
+su - ansible -c /home/ansible/ansible_script.sh;
+
 # Script execution end
-END=$(date +%s)
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt

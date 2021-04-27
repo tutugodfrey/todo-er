@@ -1,4 +1,7 @@
 #! /bin/bash
+
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -82,6 +85,11 @@ echo USE_DB=1 >> .env;
 echo DATABASE_URL=postgres://$DB_USER_NAME:$DB_USER_PASS@$DB_SERVER_HOSTNAME:$DB_PORT/$DB_NAME >> .env;
 
 npm run build;
+cd /modela;
+npm link; # create an npm link
+
+cd /todo-er;
+npm link data-modela; # Link cloned data modela to todo-er project
 
 # Set up nfs file server
 yum install nfs-utils -y # assume its not already installed
@@ -130,3 +138,8 @@ systemctl start node_exporter;
 
 ## Install and configure Zabbix agent
 #ZABBIXAGENT
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt
