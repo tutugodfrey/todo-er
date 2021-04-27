@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -99,3 +101,8 @@ yum install jenkins -y;
 yum install postgresql -y # needed to connect to db during test
 systemctl enable jenkins;
 systemctl start jenkins;
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt

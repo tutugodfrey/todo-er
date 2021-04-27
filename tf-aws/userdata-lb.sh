@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -68,32 +70,99 @@ sed -i 's/8080/80/' .env; # will remove after modify after update content of .en
 # sed -i 's/APPPORT/80/' .env;
 npm run build;
 
-cat >> /etc/nginx/conf.d/app.conf <<EOF
-server {
-    listen       80;
-    listen       [::]:80;
-    server_name  _;
-    root         /usr/share/nginx/html;
-    # Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
+# cat >> /etc/nginx/conf.d/app.conf <<EOF
+cat > /etc/nginx/nginx.conf <<EOF
+# For more information on configuration, see:
+#   * Official English Documentation: http://nginx.org/en/docs/
+#   * Official Russian Documentation: http://nginx.org/ru/docs/
 
-    location /api {
-      proxy_pass http://backends;
-    }
+user nginx;
+worker_processes auto;
+error_log /var/log/nginx/error.log;
+pid /run/nginx.pid;
 
-    error_page 404 /404.html;
-        location = /40x.html {
-    }
+# Load dynamic modules. See /usr/share/doc/nginx/README.dynamic.
+include /usr/share/nginx/modules/*.conf;
 
-    error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-    }
+events {
+    worker_connections 1024;
 }
 
-upstream backends {
-  server app1.todo.com:8080;
-  server app2.todo.com:8080;
+http {
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
+
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
+
+    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  _;
+        root         /usr/share/nginx/html;
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location /api {
+          proxy_pass http://backends;
+        }
+
+        location / {
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+          location = /50x.html {
+        }
+    }
+
+    upstream backends {
+      server app1.todo.com:8080;
+      server app2.todo.com:8080;
+    }
+
+#    server {
+#        listen       443 ssl http2 default_server;
+#        listen       [::]:443 ssl http2 default_server;
+#        server_name  _;
+#        root         /usr/share/nginx/html;
+#
+#        ssl_certificate "/etc/pki/nginx/server.crt";
+#        ssl_certificate_key "/etc/pki/nginx/private/server.key";
+#        ssl_session_cache shared:SSL:1m;
+#        ssl_session_timeout  10m;
+#        ssl_ciphers HIGH:!aNULL:!MD5;
+#        ssl_prefer_server_ciphers on;
+#
+#        # Load configuration files for the default server block.
+#        include /etc/nginx/default.d/*.conf;
+#
+#        location / {
+#        }
+#
+#        error_page 404 /404.html;
+#        location = /404.html {
+#        }
+#
+#        error_page 500 502 503 504 /50x.html;
+#        location = /50x.html {
+#        }
+#    }
+
 }
+
 EOF
 
 systemctl enable --now nginx;
@@ -139,3 +208,8 @@ systemctl start node_exporter;
 
 ## Install and configure Zabbix agent
 #ZABBIXAGENT
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt

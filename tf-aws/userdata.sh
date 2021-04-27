@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -70,12 +72,6 @@ echo "store:/todo-er /todo-er nfs _netdev 0 0" >> /etc/fstab;
 echo "store:/data /data nfs _netdev 0 0" >> /etc/fstab;
 echo "store:/modela /modela nfs _netdev 0 0" >> /etc/fstab;
 until mount -a; do echo "waiting for nfs mount to succeed"; done
-
-cd /modela;
-npm link; # create an npm link
-
-cd /todo-er;
-npm link data-modela; # Link cloned data modela to todo-er project
 
 # wait until db is fully set up
 until ping -c 3 $DB_SERVER_HOSTNAME; do echo "Waiting for DB Server to be reachable"; done;
@@ -164,3 +160,8 @@ systemctl start node_exporter;
 
 ## Install and configure Zabbix agent
 #ZABBIXAGENT
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt

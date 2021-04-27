@@ -1,5 +1,7 @@
 #! /bin/bash
 
+START=$(date +%s)
+
 METRIC_SERVER_HOSTNAME=${METRIC_SERVER_HOSTNAME}
 METRIC_SERVER_IP=${METRIC_SERVER_IP}
 JENKINS_SERVER_HOSTNAME=${JENKINS_SERVER_HOSTNAME}
@@ -108,3 +110,8 @@ sudo -i -u postgres psql < setup.sql;
 
 sed -i "/# \x22local\x22 is for Unix domain socket connections only/a local    todoapp        todoapp           md5" /var/lib/pgsql/data/pg_hba.conf;
 sed -i "/# IPv4 local connections:/a host    todoapp        todoapp         10.0.0.0/16           md5" /var/lib/pgsql/data/pg_hba.conf;
+
+# Script execution end
+END_TIME=$(date +%s)
+DURATION=$(echo "$END_TIME - $START" | bc)
+echo Execution complete in $DURATION | tee /tmp/duration.txt
