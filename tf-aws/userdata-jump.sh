@@ -211,7 +211,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create Jump server user
       user:
         name: ${JUMP_SERVER_USERNAME}
-        password: ${JUMP_SERVER_PW}
+        password: "{{ '${JUMP_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -223,7 +224,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create App server 1 user
       user:
         name: ${APP_SERVER_1_USERNAME}
-        password: ${APP_SERVER_1_PW}
+        password: "{{ '${APP_SERVER_1_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -234,7 +236,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create App server 2 user
       user:
         name: ${APP_SERVER_2_USERNAME}
-        password: ${APP_SERVER_2_PW}
+        password: "{{ '${APP_SERVER_2_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -245,7 +248,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create LB server user
       user:
         name: ${LB_SERVER_USERNAME}
-        password: ${LB_SERVER_PW}
+        password: "{{ '${LB_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -256,7 +260,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create DB Server user
       user:
         name: ${DB_SERVER_USERNAME}
-        password: ${DB_SERVER_PW}
+        password: "{{ '${DB_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -267,7 +272,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create storage server user
       user:
         name: ${STORAGE_SERVER_USERNAME}
-        password: ${STORAGE_SERVER_PW}
+        password: "{{ '${STORAGE_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -278,7 +284,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create Jenkins user
       user:
         name: ${JENKINS_SERVER_USERNAME}
-        password: ${JENKINS_SERVER_PW}
+        password: "{{ '${JENKINS_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -289,7 +296,8 @@ cat > /home/ansible/create-user.yml <<EOF
     - name: Create Metric User
       user:
         name: ${METRIC_SERVER_USERNAME}
-        password: ${METRIC_SERVER_PW}
+        password: "{{ '${METRIC_SERVER_PW}' | password_hash('sha512') }}"
+        update_password: on_create
         groups:
         - wheel
         append: yes
@@ -298,10 +306,10 @@ EOF
 cat > /home/ansible/ansible_script.sh <<EOF
 #! /bin/bash
 counter=0;
-until ansible all -i inventory -m shell -a 'whoami' > ansible_answer.txt || [ $counter -gt 20 ]; do
+until ansible all -i inventory -m shell -a 'whoami' > ansible_answer.txt || [ \$counter -gt 20 ]; do
   echo Waiting for managed servers to be ready; sleep 3;
   ((counter++));
-  echo $counter;
+  echo \$counter;
 done;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
@@ -342,6 +350,110 @@ yum install git -y;
 
 ## Test the ansible configuration
 su - ansible -c /home/ansible/ansible_script.sh;
+
+## Use puppet to copy ssh key for users managed nodes
+cat > /etc/puppetlabs/code/environments/production/manifests/sshkey.pp <<EOF
+# ssh_public_key will be replace during script execution
+# and before running the puppet apply
+\$ssh_public_key = 'SSH_PUBLIC_KEY'
+
+class ssh_node_metric {
+  ssh_authorized_key { '${METRIC_SERVER_USERNAME}@${METRIC_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${METRIC_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_jenkins {
+  ssh_authorized_key { '${JENKINS_SERVER_USERNAME}@${JENKINS_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${JENKINS_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_jump {
+  ssh_authorized_key { '${JUMP_SERVER_USERNAME}@${JUMP_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${JUMP_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_app1 {
+  ssh_authorized_key { '${APP_SERVER_1_USERNAME}@${APP_SERVER_1_HOSTNAME}':
+   ensure => present,
+   user => '${APP_SERVER_1_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_app2 {
+  ssh_authorized_key { '${APP_SERVER_2_USERNAME}@${APP_SERVER_2_HOSTNAME}':
+   ensure => present,
+   user => '${APP_SERVER_2_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_lb {
+  ssh_authorized_key { '${LB_SERVER_USERNAME}@${LB_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${LB_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_storage {
+  ssh_authorized_key { '${STORAGE_SERVER_USERNAME}@${STORAGE_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${STORAGE_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+class ssh_node_db {
+  ssh_authorized_key { '${DB_SERVER_USERNAME}@${DB_SERVER_HOSTNAME}':
+   ensure => present,
+   user => '${DB_SERVER_USERNAME}',
+   type => 'ssh-rsa',
+   key => \$ssh_public_key,
+  }
+}
+
+node default {}
+node '${METRIC_SERVER_HOSTNAME}' {
+  include ssh_node_metric
+}
+node '${JENKINS_SERVER_HOSTNAME}' {
+  include ssh_node_jenkins
+}
+#node '${JUMP_SERVER_HOSTNAME}' {
+#  include ssh_node_jump
+#}
+node '${APP_SERVER_1_HOSTNAME}' {
+  include ssh_node_app1
+}
+node '${APP_SERVER_2_HOSTNAME}' {
+  include ssh_node_app2
+}
+node '${LB_SERVER_HOSTNAME}' {
+  include ssh_node_lb
+}
+node '${STORAGE_SERVER_HOSTNAME}' {
+  include ssh_node_storage
+}
+node '${DB_SERVER_HOSTNAME}' {
+  include ssh_node_db
+}
+EOF
+
+ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa;
+# Removing string ssh-rsa and user@host at the beginning and end respectively
+sed -i "s|SSH_PUBLIC_KEY|$(cat /root/.ssh/id_rsa.pub | cut -d' ' -f 2)|" /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
+puppet apply /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
+
 
 # Script execution end
 END_TIME=$(date +%s)
