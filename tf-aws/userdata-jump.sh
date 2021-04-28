@@ -204,8 +204,8 @@ EOF
 
 # Use ansible to create dedicated users for all our servers
 cat > /home/ansible/create-user.yml <<EOF
-- name: Jump Server
-  hosts: jump
+- name: Create dedicated users for each server
+  hosts: all
   become: yes
   tasks:
     - name: Create Jump server user
@@ -216,11 +216,8 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-        ignore_errors: true
-- name: App Server 1
-  hosts: app1
-  become: yes
-  tasks:
+      ignore_errors: true
+      when: ansible_nodename.find('jump') != -1
     - name: Create App server 1 user
       user:
         name: ${APP_SERVER_1_USERNAME}
@@ -229,10 +226,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: App Server 2
-  hosts: app2
-  become: yes
-  tasks:
+      when: ansible_nodename.find('app1') != -1
     - name: Create App server 2 user
       user:
         name: ${APP_SERVER_2_USERNAME}
@@ -241,10 +235,8 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: LB Server
-  hosts: lb
-  become: yes
-  tasks:
+      when: ansible_nodename.find('app2') != -1
+
     - name: Create LB server user
       user:
         name: ${LB_SERVER_USERNAME}
@@ -253,10 +245,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: DB Server
-  hosts: db
-  become: yes
-  tasks:
+      when: ansible_nodename.find('lb') != -1
     - name: Create DB Server user
       user:
         name: ${DB_SERVER_USERNAME}
@@ -265,10 +254,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: Create Users
-  hosts: store
-  become: yes
-  tasks:
+      when: ansible_nodename.find('db') != -1
     - name: Create storage server user
       user:
         name: ${STORAGE_SERVER_USERNAME}
@@ -277,10 +263,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: Jenkins Server
-  hosts: jenkins
-  become: yes
-  tasks:
+      when: ansible_nodename.find('store') != -1
     - name: Create Jenkins user
       user:
         name: ${JENKINS_SERVER_USERNAME}
@@ -289,10 +272,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
-- name: Metric Server
-  hosts: metrics
-  become: yes
-  tasks:
+      when: ansible_nodename.find('jenkins') != -1
     - name: Create Metric User
       user:
         name: ${METRIC_SERVER_USERNAME}
@@ -301,6 +281,7 @@ cat > /home/ansible/create-user.yml <<EOF
         groups:
         - wheel
         append: yes
+      when: ansible_nodename.find('metrics') != -1
 EOF
 
 cat > /home/ansible/ansible_script.sh <<EOF
@@ -450,7 +431,7 @@ node '${DB_SERVER_HOSTNAME}' {
 EOF
 
 ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa;
-# Removing string ssh-rsa and user@host at the beginning and end respectively
+# Use cut get just the rsa key.
 sed -i "s|SSH_PUBLIC_KEY|$(cat /root/.ssh/id_rsa.pub | cut -d' ' -f 2)|" /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
 puppet apply /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
 
