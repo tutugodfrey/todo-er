@@ -101,6 +101,12 @@ yum install jenkins -y;
 yum install postgresql -y # needed to connect to db during test
 systemctl enable jenkins;
 systemctl start jenkins;
+yum install git -y;
+
+# Install node.js
+yum install -y gcc-c++ make;
+curl -sL https://rpm.nodesource.com/setup_15.x | sudo -E bash -;
+yum install nodejs -y;
 
 # Script execution end
 END_TIME=$(date +%s)
