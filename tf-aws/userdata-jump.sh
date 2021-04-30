@@ -284,6 +284,34 @@ cat > /home/ansible/create-user.yml <<EOF
       when: ansible_nodename.find('metrics') != -1
 EOF
 
+cat > /home/ansible/gen-jenkins-server-ssh-key.yml <<EOF
+## This should enable remote ssh login from jenkins
+## hosts through their dedicated user
+
+- hosts: jenkins
+  name: Generate ssh on Jenkins
+  become: yes
+  tasks:
+  - name: Generate key
+    openssh_keypair:
+      type: rsa
+      size: 2048
+      path: /root/.ssh/id_rsa
+      state: present
+      force: no
+    register: gen_key_output
+
+- hosts: all
+  name: Copy public ssh key
+  become: yes
+  tasks:
+  - name: Copy keys from Jenkins to other others
+    lineinfile:
+      path:  /home/{{ user }}/.ssh/authorized_keys
+      line: "{{ hostvars['jenkins']['gen_key_output']['public_key'] }}"
+    when: hostvars['jenkins']['gen_key_output']['public_key'] is defined
+EOF
+
 cat > /home/ansible/ansible_script.sh <<EOF
 #! /bin/bash
 counter=0;
@@ -295,7 +323,19 @@ done;
 ansible-playbook -i inventory gather-facts.yml;
 ansible-playbook -i inventory create-user.yml;
 EOF
-chown ansible:ansible /home/ansible/{gather-facts,create-user}.yml;
+
+# change permission on host vars file
+mkdir /home/ansible/host_vars;
+echo user: ${STORAGE_SERVER_USERNAME} > /home/ansible/host_vars/store;
+echo user: ${APP_SERVER_1_USERNAME} > /home/ansible/host_vars/app1;
+echo user: ${JUMP_SERVER_USERNAME} > /home/ansible/host_vars/jump;
+echo user: ${APP_SERVER_2_USERNAME} > /home/ansible/host_vars/app2;
+echo user: ${METRIC_SERVER_USERNAME} > /home/ansible/host_vars/metrics;
+echo user: ${DB_SERVER_USERNAME} > /home/ansible/host_vars/db;
+echo user: ${JUMP_SERVER_USERNAME} > /home/ansible/host_vars/jenkins;
+echo user: ${LB_SERVER_USERNAME}> /home/ansible/host_vars/lb;
+chown ansible -R /home/ansible/host_vars;
+chown ansible:ansible /home/ansible/{gather-facts,create-user,gen-jenkins-server-ssh-key}.yml;
 chown ansible:ansible /home/ansible/ansible_script.sh;
 chmod +x /home/ansible/ansible_script.sh;
 
@@ -435,6 +475,9 @@ ssh-keygen -t rsa -b 2048 -f /root/.ssh/id_rsa;
 sed -i "s|SSH_PUBLIC_KEY|$(cat /root/.ssh/id_rsa.pub | cut -d' ' -f 2)|" /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
 puppet apply /etc/puppetlabs/code/environments/production/manifests/sshkey.pp;
 
+sleep 25; # await for puppet agent on slave nodes to pull
+cd /home/ansible/;
+su - ansible -c 'ansible-playbook -i inventory gen-jenkins-server-ssh-key.yml';
 
 # Script execution end
 END_TIME=$(date +%s)
