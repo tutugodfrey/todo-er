@@ -37,11 +37,24 @@ You can also provide this as --build-arg in your docker run command as follows
 
 Note the API_URL should be the base url that frontend app will run on. if your are running on localhost, the port should correspond with the port you set in your env or build-arg for docker run command. The default port for running the application in development is 3005 and hence the default API_URL is set as 3005. Useful when running the application in development. If you which to use another port please provide it as --build-arg to your docker build command or export your docker environment variable in docker build command as --env-file=path/to/.env.
 
-### Examples
+## Deploying the Application
+
+There are various options possible for deploying this application to testing, staging or production environment.
+
+[Provision Datacenter on AWS and Deploy with Terraform IaC](tf-aws/README.md)
+
+[Deploy to Google Cloud](deploy-to-google-cloud/README.md)
+
+[Deployment with Docker](#Deployment-with-docker)
+
+[Deployment with Kubernetes](k8s/README.md)
+
+### Deployment with Docker
+
 #### using build-arg
 - `$ docker build --build-arg JWT_SECRET=somethingfishing --build-arg port=3005  -t todoapp:latest .`
 
-- API_URL=http://localhost:3005/api  --- change the port to your desired port and make the API_URL available in our .env file
+- API_URL=http://localhost:3005/api  -- change the port to your desired port and make the API_URL available in our .env file
 
 ### Build the frontend image
 
@@ -51,11 +64,6 @@ Note the API_URL should be the base url that frontend app will run on. if your a
 
 - `docker run -d --name todofrontend -p 8084:80 tutug/todoapp-fd`
 
-#### Using Jenkin build
-- Add JWT_SECRET key  and value pair to your jenkins environment variables. this will be used as --build-arg for building docker images
-
-#### Kubernetes 
-- If your wish to change the PORT for docker build, also remember to change the PORT for kubernetes service and deployment
 
 ## Author
-Tutu Godfrey<godfrey_tutu@yahoo.com>
+Tutu Godfrey <godfrey_tutu@yahoo.com>
