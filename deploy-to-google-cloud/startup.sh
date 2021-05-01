@@ -13,9 +13,6 @@ JWT_SECRET=JWTSECRET; export JWT_SECRET
 PORT=APPPORT; export PORT
 IP=SERVERIP; export IP
 
-# fetch exportenvs.sh file from cloud storage.
-# gsutil cp gs://todo-er/exportenvs.sh exportenvs.sh
-
 # Setup environment variables
 ./setenv.sh
 

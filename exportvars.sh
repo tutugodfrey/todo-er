@@ -1,3 +1,0 @@
-export JWTSECRET=JWTSECRET
-export APPPORT=APPPORT
-# export IP=IP
