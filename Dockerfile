@@ -18,6 +18,8 @@ ARG JWT_SECRET
 RUN touch .env.example
 ENV PORT=${PORT}
 ENV JWT_SECRET=${JWT_SECRET}
+ENV USE_DB # if supplied should be 1. To enable persistent storage
+ENV DATABASE_URL # Provide the endpoint to reach the database
 RUN npm install --production
 COPY public/background-image.jpg ./public
 COPY src ./src

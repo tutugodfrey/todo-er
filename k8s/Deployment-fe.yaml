@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-fe-deployment
+  namespace: default
+  labels:
+    app: todoapp-fe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todoapp-fe
+  template:
+    metadata:
+      labels:
+        app: todoapp-fe
+    spec:
+      containers:
+      - name: todoapp-fe-container
+        image: tutug/todoapp-fe:latest
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            port: 80
+            path: /
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        imagePullPolicy: IfNotPresent
