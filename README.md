@@ -24,6 +24,22 @@ Add environment variable after what is .env.example
 To run e2e test, you may need to reinstall the chromedriver to match your version of your chrome browser.
 My latest install version is `^86.0.0`. But I've changed the version in package.json to earlier version `80.0.1` because it is causing the build to fail on CircleCI.
 
+## Deploying the Application
+
+There are various options possible for deploying this application to testing, staging or production environment. Click any of the links below to see what is possible
+
+[Provision Datacenter on AWS and Deploy with Terraform IaC](tf-aws/README.md)
+
+[Deploy to Google Cloud](deploy-to-google-cloud/README.md)
+
+[Deployment with Docker](#Deployment-with-docker)
+
+[Deployment with Kubernetes](k8s/README.md)
+
+### Deployment with Docker
+
+This section provide instructions on how to deploy and test the application in a docker container. Dockerfiles to build the frontend and the backend images are present in the root directory of the project. There is also the `docker-helper.sh` that contains functions for building images, running containers, pushing container to Docker Hub, delete images and containers.
+
 ## Building a docker images
 Environment variable require for building an image in 
 - PORT
@@ -37,33 +53,30 @@ You can also provide this as --build-arg in your docker run command as follows
 
 Note the API_URL should be the base url that frontend app will run on. if your are running on localhost, the port should correspond with the port you set in your env or build-arg for docker run command. The default port for running the application in development is 3005 and hence the default API_URL is set as 3005. Useful when running the application in development. If you which to use another port please provide it as --build-arg to your docker build command or export your docker environment variable in docker build command as --env-file=path/to/.env.
 
-## Deploying the Application
+To begin source the file to expose the functions
 
-There are various options possible for deploying this application to testing, staging or production environment.
+`. ./docker-helper.sh` Use `-h` or `--help` to get help
 
-[Provision Datacenter on AWS and Deploy with Terraform IaC](tf-aws/README.md)
+After sourcing the file, the following functions are exposed
 
-[Deploy to Google Cloud](deploy-to-google-cloud/README.md)
+**Note:** argument in [] are optional
 
-[Deployment with Docker](#Deployment-with-docker)
+`build_image_be JWT_SECRET [PORT_NUMBER] [IMAGE_NAME]`  Build the backned image. provide the JWT_SECRET value that the application will use. This value is required. You can also provide port to expose as well and the image name and tag
 
-[Deployment with Kubernetes](k8s/README.md)
+`run_container_be [CONTAINER_NAME] [PORT_NUMBER]`  Run the backend container. You can provide optional argument for the container name and port to bind to. If not provide default values will be used. Changing the argument will enable you to run multiple copies of the container image.
 
-### Deployment with Docker
 
-#### using build-arg
-- `$ docker build --build-arg JWT_SECRET=somethingfishing --build-arg port=3005  -t todoapp:latest .`
+`build_image_fe [API_URL] [IMGE_NAME]` Build the frontend image. To enable api request reach the backend service, You will need to provide the API_URL argument. Otherwise, the application will bind to localhost. The API_URL is just a way to allow requests from the frontend reach the backend. Thus, it could for example be the uri of an nginx server if nginx is configure to proxy requests to the backend.
 
-- API_URL=http://localhost:3005/api  -- change the port to your desired port and make the API_URL available in our .env file
+`run_container_fe [CONTAINER_NAME] [PORT_NUMBER]` Run the frontend container. You can provide optional arguments [CONTAINER_NAME] [PORT_NUMBER] to change the defaults. Changing the argument will enable you to run multiple copies of the container image.
 
-### Build the frontend image
+`delete_image -fe` Delete an image. Provide `-fe` for frontend  or `-be` backend.
 
-- `docker build -t tutug/todoapp-fd:latest -f dockerfile-frontend .`
+`delete_container -fe [-f]`  Delete a container. Provide `-be` for backend or `-fe` for frontend image. You can also provide `-f` to force the container delete if it is still running.
 
-### Expose the frontend app
+`push_image -fe`  push docker image to repository. provide `-be` for backend image or `-fe` for for the frontend image
 
-- `docker run -d --name todofrontend -p 8084:80 tutug/todoapp-fd`
-
+When any of the command run, you will be able to see exactly what is executed. You can copy and modify it if you desire to.
 
 ## Author
 Tutu Godfrey <godfrey_tutu@yahoo.com>
