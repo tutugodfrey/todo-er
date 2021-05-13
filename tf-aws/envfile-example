@@ -1,5 +1,13 @@
 #! /bin/bash
 
+# Content of this file should be copied to envfile before running the deploy.sh script
+# Please fill in the appropriate variables also.
+
+AWS_PROFILE=
+AWS_REGION=us-west-2
+EC2_KEYPAIR=
+INSTANCE_TYPE=t2.micro
+
 DB_NAME=
 DB_USERNAME=
 DB_PASSWD=

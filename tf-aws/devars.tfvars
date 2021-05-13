@@ -1,8 +1,8 @@
-profile = "tgodfrey"
-region  = "us-west-2"
+profile = "AWS_PROFILE"
+region  = "AWS_REGION"
 
-ec2_instance_type = "t2.micro"
-ec2_keypair = "aws2-oregon-key"
+ec2_instance_type = "INSTANCE_TYPE"
+ec2_keypair = "EC2_KEYPAIR"
 
 # amazon linux 2 ami id
 app_server_ami_id = "ami-0e999cbd62129e3b1"
