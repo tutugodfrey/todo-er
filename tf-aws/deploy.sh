@@ -19,6 +19,11 @@ ZABBIX_USERNAME=${ZABBIX_USERNAME}
 ZABBIX_DB=${ZABBIX_DB}
 ZABBIX_PS=${ZABBIX_PS}
 
+sed -i -e "s/AWS_PROFILE/${AWS_PROFILE}/" devars.tfvars
+sed -i -e "s/AWS_REGION/${AWS_REGION}/" devars.tfvars
+sed -i -e "s/INSTANCE_TYPE/${INSTANCE_TYPE}/" devars.tfvars
+sed -i -e "s/EC2_KEYPAIR/${EC2_KEYPAIR}/" devars.tfvars
+
 sed -i -e "s/DB_NAME/${DB_NAME}/" devars.tfvars
 sed -i -e "s/DB_USERNAME/${DB_USERNAME}/" devars.tfvars
 sed -i -e "s/DB_PASSWD/${DB_PASSWD}/" devars.tfvars
@@ -141,11 +146,18 @@ sed -i -e "s|#NODEEXPORTER|$(cat nodeexporter)|" {userdata,userdata-jenkins,user
 sed -i -e "s|#ZABBIXAGENT|$(cat zabbixagent)|" {userdata,userdata-jenkins,userdata-db,userdata-lb,userdata-storage,userdata-jump}.sh
 
 # EXECUTE TERRAFORM APPLY
-terraform apply --auto-approve -var-file devars.tfvars
+terraform init;
+terraform plan -var-file devars.tfvars;
+terraform apply tfoutput.tf --auto-approve -var-file devars.tfvars
 
 sleep 5
 
 # Reverse the changes after terraform successful deploy
+sed -i -e "s/${AWS_PROFILE}/AWS_PROFILE/" devars.tfvars
+sed -i -e "s/${AWS_REGION}/AWS_REGION/" devars.tfvars
+sed -i -e "s/${INSTANCE_TYPE}/INSTANCE_TYPE/" devars.tfvars
+sed -i -e "s/${EC2_KEYPAIR}/EC2_KEYPAIR/" devars.tfvars
+
 sed -i -e "s/${DB_NAME}/DB_NAME/" devars.tfvars
 sed -i -e "s/${DB_USERNAME}/DB_USERNAME/" devars.tfvars
 sed -i -e "s/${DB_PASSWD}/DB_PASSWD/" devars.tfvars
