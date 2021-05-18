@@ -101,4 +101,8 @@ Jenkins Pipeline for deploying the application to K8s need updates. Once that is
 - Add JWT_SECRET key  and value pair to your jenkins environment variables. this will be used as --build-arg for building docker images.
 
 
+## Useful commands for interacting with Kubernetes Objects
 
+To view logs for frontend deployment (Change the pod name to what is created for you)
+
+`kubectl logs todoapp-fe-deployment-54659bc577-hgqfc --container log-container`
