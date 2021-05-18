@@ -13,7 +13,7 @@ const request = async (route, method = 'GET', data = {}) => {
         },
       })
   } else if (data instanceof FormData) {
-    res = await fetch(baseUrl +route,
+    res = await fetch(baseUrl + route,
       {
         method: method,
         enctype: "multipart/form-data",

@@ -22,8 +22,8 @@ function docker_deploy_help() {
     build_image_fe: accepts 2 optional arguments ARG 1 API_URL the url to reach backend service, 
     ARG 2 imagename  to overide the default
 
-    run_container_fe: Accept 2 optional arguments, ARG 1 container name, 
-    ARG 2 PORT number that the container will map to.
+    run_container_fe: Accept 2 optional arguments, ARG 1 PORT to map to container port, 
+    ARG 2 CONTAINER_NAME to overide default container name.
     If not provided, container will map to the same port that was used to build the image.
 
     delete_image: -fe | -be : specify which image to delete -fe for frontend, -be for backend
@@ -102,14 +102,16 @@ function build_image_fe() {
 function run_container_fe () {
   PORT_MAP=$PORT_FE
   if [[ $# == 1 ]]; then
-    CONTAINER_NAME_FE=$1
+    PORT_MAP=$1
   fi
 
   if [[ $# == 2 ]]; then
-    CONTAINER_NAME_FE=$1
-    PORT_MAP=$2
+    PORT_MAP=$1
+    CONTAINER_NAME_FE=$2
   fi
-  command="docker run -d --name $CONTAINER_NAME_FE -p $PORT_MAP:$PORT_FE $IMAGE_NAME_FE";
+
+  # command="docker run -d --name $CONTAINER_NAME_FE -p $PORT_MAP:$PORT_FE $IMAGE_NAME_FE";
+  command="docker run -d --name $CONTAINER_NAME_FE -p $PORT_MAP:$PORT_FE --link todoapp-container-be:todoapp-container-be $IMAGE_NAME_FE";
   echo Executing: $command;
   $command
 }
@@ -174,3 +176,9 @@ function delete_container() {
 }
   
 echo Get help by providing the flags "-h" or "--help"
+
+## Other useful commands
+#docker save tutug/todoapp-fe -o frontend-image
+#docker save tutug/todoapp-fe -o frontend-image
+#docker load -i frontend-image
+#docker load -i frontend-image
