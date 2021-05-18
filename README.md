@@ -68,7 +68,7 @@ After sourcing the file, the following functions are exposed
 
 `build_image_fe [API_URL] [IMGE_NAME]` Build the frontend image. To enable api request reach the backend service, You will need to provide the API_URL argument. Otherwise, the application will bind to localhost. The API_URL is just a way to allow requests from the frontend reach the backend. Thus, it could for example be the uri of an nginx server if nginx is configure to proxy requests to the backend.
 
-`run_container_fe [CONTAINER_NAME] [PORT_NUMBER]` Run the frontend container. You can provide optional arguments [CONTAINER_NAME] [PORT_NUMBER] to change the defaults. Changing the argument will enable you to run multiple copies of the container image.
+`run_container_fe [PORT_NUMBER] [CONTAINER_NAME]` Run the frontend container. You can provide optional arguments [PORT_NUMBER] and [CONTAINER_NAME] to change the defaults. Changing the argument will enable you to run multiple copies of the container image.
 
 `delete_image -fe` Delete an image. Provide `-fe` for frontend  or `-be` backend.
 
