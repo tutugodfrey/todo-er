@@ -1,5 +1,10 @@
 # Welcome to the Task Masker Data Center
 
+**Infrastructure Architectural Design**
+
+![Data center Architecture Diagram](../architectural-diagram.png)
+
+
 Please read through to understand the architecture of this data center.
 
 This Data Center uses Terraform (an IaC) tool to provision infrastructure on AWS on which we are deploying our application and other necessary technologies/ tools to enable effective operation and monitoring of the application while in production.
