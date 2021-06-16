@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: jenkins-pod
-        image: jenkin
+        image: jenkins/jenkins
         ports: 
         - containerPort: 8080
 
