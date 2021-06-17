@@ -138,9 +138,11 @@ Some general installation and configuration
 
 ## Deploying the Infrastructure
 
-The infrastructure can be deployed in a repeatable way using the `./deploy.sh` script. The script is a helper for managing variables and shared scripts across the different servers. It also help to echo that secret credentials are not exposed in the source code. The script will prove to be a single source of truth for installation, and variables that are shared across all userdata scripts.
+The infrastructure can be deployed in a repeatable way using the `./deploy.sh` script. The script is a helper for managing variables and shared scripts across the different servers. It also help to ensure that secret credentials are not exposed in the source code. The script will prove to be a single source of truth for installation, and variables that are shared across all userdata scripts. This `/deploy.sh` script contains two functions `deploy_infra` and `destroy_infra` to provision and clean up the infrastructure respectively.
 
 Before executing the `./deploy.sh` script please copy over the content of the `envfile-example` to `envfile` and files with the appropriate values. The `envfile` contains secrets and variables that is needed to successfully deploy the infrastructure in a repeatable. This file is require by the `./deploy.sh` script to get and populate terraform variables and other variables needed by the userdata scripts.
+
+The files `swap-tf-vars.sh` and `revert-swap-tf-vars.sh` will take care of swaping in Terraform variables and swaping them out during and after the successful execution of the provided functions in the `deploy.sh` script.
 
 To ensure that the source code always stay unchange from repeatable deploy, any changes made during the deploy process is automatically reversed after Terraform finish provision on in the event that the Terraform command fail. The only place where you need to make any modification is the `envfile` and is not to be committed to source code repository.
 
@@ -157,8 +159,28 @@ Run `cp envfile-example envfile`
 
 Then, open the file and fill in the appropriate variables
 
-Run `./deploy.sh` 
+Source the provided functions
+
+```bash
+. ./deploy.sh
+``` 
+
+```bash
+deploy_infra
+```
 
 This will about provisioning our infrastructure on AWS. Once the infrastructure has finish provisioning, you should be able to login to the server using the ip address and dns output of Terraform.
 
 **NOTE:** After the Terraform finish provisioning, it will take some time before the server will be fully ready. This is because of the time needed to execute userdata scripts. Also some of the server will need to wait for others to have provisioned a particular software before they can proceed with their configuration. For example App server 1 and App Server 2 will need to wait for Storage server to download, install and mount the source code on `/todo-er` directory before attempting to start the backend service.
+
+## Clean Up
+
+To destroy the infrastructure execute the destroy function
+
+```bash
+destroy_infra
+```
+
+This will destroy the resources created
+
+
