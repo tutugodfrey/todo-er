@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-deployment
+  labels:
+    run: prometheus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: prometheus
+  template:
+    metadata:
+      labels:
+        run: prometheus
+    spec:
+      containers:
+      - name: prometheus-container
+        image: prom/prometheus
+        ports:
+        -  containerPort: 9090
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  selector:
+    run: prometheus
+  type: NodePort
+  ports:
+  - protocol: TCP
+    port: 9090
+    targetPort: 9090
+    nodePort: 30003
+
+
