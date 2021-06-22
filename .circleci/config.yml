@@ -5,7 +5,7 @@ jobs:
       # environment
       CC_TEST_REPORTER_ID: 2bb20e058832f62485904001a0f1f6052dbc95561a97e7a9a6b060434b573a9d
     docker:
-      - image: circleci/node:9.10.0
+      - image: circleci/node:13.8.0
     working_directory: ~/app
     steps:
       - checkout
@@ -59,7 +59,7 @@ jobs:
             ./cc-test-reporter before-build
       - run:
           name: Run Test
-          command:
+          command: |
             npm run coverage
       - run:
           name: Send coverage report
