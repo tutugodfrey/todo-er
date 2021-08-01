@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: todoapp-be
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.selector.app }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.selector.app }}
+    spec:
+      initContainers:
+      - name: check-db-service
+        image: busybox
+        # Wait for the database to be ready
+        command: ['sh', '-c', 'until nslookup todoapp-db-service; do echo Waiting for db service; sleep 3; done;']
+      - name: create-db-todoapp
+        # Create the database for the application to use
+        # SQL is gotten from ConfigMap
+        image: postgres
+        command: ['bash', '-c', 'psql -U postgres -h todoapp-db-service -p 5432 < /sql-files/createdb.sql']
+        volumeMounts:
+        - name: sql-volume
+          mountPath: /sql-files
+      containers:
+      - name: {{ .Values.container.name }}
+        image: {{ .Values.container.image }}:{{ .Values.contianer.tag }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: {{ .Values.container.containerPort }}
+        env:
+          - name: USE_DB
+            value: '1'
+          - name: DATABASE_URL
+            value: postgres://postgres:postgres@todoapp-db-service:5432/todoapp
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.contaier.containerPort }}
+            path: /api
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: sql-volume
+        configMap:
+          name: sql-config
+

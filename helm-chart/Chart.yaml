@@ -1,0 +1,16 @@
+apiVersion: v1
+name: todo-er-app
+description: Deployment configuration for todo-er app
+keywords:
+  - Node.js
+  - Kubernetes
+  - Docker
+  - Prometheus
+  - Grafana
+  - Todos
+version: 1.1
+maintainers:
+  - name: Godfrey Tutu
+    email: godfrey_tutu@yahoo.com
+
+

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: todoapp-fe
+spec:
+  replicas: {{ .Values.deployment.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.selector.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.selector.app }}
+    spec:
+      containers:
+      - name: {{ .Values.container.name }}
+        image: {{ .Values.container.image }}:{{ .Values.container.tag }}
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+          limits:
+            cpu: 200m
+            memory: 200Mi
+        ports:
+        - containerPort: {{ .Values.container.containerPort }}
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.container.containerPort }}
+            path: /
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/nginx
+      - name: log-container
+        image: busybox:latest
+        command: ["sh", "-c", "while true; do cat /var/log/nginx/access.log /var/log/nginx/error.log; sleep 30; done"]
+        volumeMounts:
+        - name: shared-logs
+          mountPath: /var/log/nginx     
+      volumes:
+      - name: shared-logs
+        emptyDir: {}
