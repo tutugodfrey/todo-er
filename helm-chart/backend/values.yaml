@@ -1,0 +1,23 @@
+namespace:
+  name: dev
+
+deployment
+  name: todoapp-be-deployment
+  replicaCount: 1
+
+container:
+  name: todoapp-be-container
+  image: tutug/todoapp-be
+  tag: latest
+  containerPort: 3005
+
+
+selector:
+  app: todoapp-be
+
+
+service
+  name: todoapp-be-service
+  type: LoadBalancer
+  port: 3005
+  targetPort: 3005

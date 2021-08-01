@@ -1,0 +1,12 @@
+apiVersion: v1
+name: todoapp-fe
+description: Chart for todo-er frontend
+keywords:
+  - React
+  - Nodejs
+  - Kubernetes
+  - Docker
+version: 1.1
+maintainers:
+  - name: Godfrey Tutu
+    email: godfrey_tutu@yahoo.com

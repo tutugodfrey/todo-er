@@ -1,0 +1,15 @@
+namespace:
+  name: dev
+
+frondendDeploy:
+  image:
+    repository:
+    tag:
+  replicaCount: 1
+
+backendDeploy:
+  image:
+    repository: 
+    tag:
+  replicaCount: 1
+

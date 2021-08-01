@@ -1,0 +1,21 @@
+namespace:
+  name: dev
+
+deployment:
+  name: todoapp-fe-deployment
+  replicaCount: 1
+   
+container:
+  name: todoapp-fe-container
+  image: tutug/todoapp-fe
+  tag: latest
+  containerPort: 80
+
+selector:
+  app: todoapp-fe
+
+service:
+  name: todoapp-fe-service
+  port: 80
+  targetPort: 80
+  type: LoadBalancer
