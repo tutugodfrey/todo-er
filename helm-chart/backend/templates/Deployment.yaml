@@ -35,7 +35,7 @@ spec:
           mountPath: /sql-files
       containers:
       - name: {{ .Values.container.name }}
-        image: {{ .Values.container.image }}:{{ .Values.contianer.tag }}
+        image: {{ .Values.container.image }}:{{ .Values.container.tag }}
         resources:
           requests:
             cpu: 100m
