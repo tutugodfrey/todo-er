@@ -1,7 +1,7 @@
 namespace:
   name: dev
 
-deployment
+deployment:
   name: todoapp-be-deployment
   replicaCount: 1
 
