@@ -52,7 +52,7 @@ spec:
             value: postgres://postgres:postgres@todoapp-db-service:5432/todoapp
         livenessProbe:
           httpGet:
-            port: {{ .Values.contaier.containerPort }}
+            port: {{ .Values.container.containerPort }}
             path: /api
           initialDelaySeconds: 10
           periodSeconds: 5
