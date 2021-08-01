@@ -16,7 +16,7 @@ selector:
   app: todoapp-be
 
 
-service
+service:
   name: todoapp-be-service
   type: LoadBalancer
   port: 3005
