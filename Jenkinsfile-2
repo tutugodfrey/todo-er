@@ -1,0 +1,28 @@
+pipeline {
+  agent any
+  stages {
+    stage('Cloning Git') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        sh 'npm install'
+      }
+    }
+
+    stage('Test') {
+      steps {
+        sh 'npm test'
+      }
+    }
+    stage('Copy file to storage server') {
+      steps {
+        sh 'npm install'
+      }
+    }
+  }
+}
+
