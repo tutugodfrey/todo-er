@@ -161,6 +161,25 @@ systemctl start node_exporter;
 ## Install and configure Zabbix agent
 #ZABBIXAGENT
 
+#
+yum install amazon-cloudwatch-agent -y;
+
+cat >  /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
+{
+  "agent": {
+    "metrics_collection_interval": 30,
+    "regions": "us-west-2",
+    "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+    "debug": false
+  },
+  "metrics": {
+
+  },
+  "logs": {
+
+  }
+}
+EOF
 # Script execution end
 END_TIME=$(date +%s)
 DURATION=$(echo "$END_TIME - $START" | bc)
